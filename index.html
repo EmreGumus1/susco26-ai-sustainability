@@ -259,20 +259,66 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.22); opacity: 0; transition: opacity 0.1s ease;
   }
 
+  /* BATCHING AND PROMPTS HIGHLIGHT SECTION */
+  .bp-section { margin-top: 28px; scroll-margin-top: 66px; }
+  .bp-header { margin-bottom: 18px; }
+  .bp-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+  .bp-header h2 {
+    margin: 6px 0 10px; font-size: clamp(28px, 3.2vw, 38px); font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.08; color: var(--ink);
+  }
+  .bp-subtitle { margin: 0; max-width: 680px; font-size: 15.5px; color: #515154; line-height: 1.5; }
+  .bp-card {
+    background: var(--card); border: 1px solid var(--border-soft); border-radius: 22px;
+    padding: 30px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.045);
+  }
+  .bp-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 44px; align-items: start; }
+  .bp-col-label { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+  .bp-ctrl-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .bp-pills {
+    display: inline-flex; align-items: center; gap: 4px; padding: 4px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+  }
+  .bp-pill {
+    width: 36px; height: 34px; border: none; border-radius: 999px; background: transparent;
+    font-family: var(--font-sans); font-size: 13.5px; font-weight: 700; color: #515154;
+    cursor: pointer; transition: all 0.16s ease;
+  }
+  .bp-pill:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+  .bp-pill.active { background: var(--ink); color: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
+  .bp-bars { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .bp-bar-row { display: grid; grid-template-columns: 116px 1fr 56px; gap: 14px; align-items: center; }
+  .bp-bar-lbl { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .bp-bar-track { height: 28px; border-radius: 8px; background: #F2F2F7; overflow: hidden; }
+  .bp-bar-fill { height: 100%; border-radius: 8px; transition: width 0.25s cubic-bezier(.22,.9,.32,1); }
+  .bp-bar-fill.bp-orange { background: var(--orange); }
+  .bp-bar-fill.bp-blue { background: var(--blue); }
+  .bp-bar-val { font-size: 13.5px; font-weight: 800; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .bp-caption { margin-top: 14px; font-size: 12.2px; color: var(--gray); }
+  .bp-takeaway {
+    margin-top: 22px; font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--ink); line-height: 1.25;
+  }
+  .bp-callouts { display: flex; flex-direction: column; gap: 12px; }
+  .bp-callout { background: #FDF0E6; border-radius: 14px; padding: 14px 18px; }
+  .bp-callout-num { font-size: 20px; font-weight: 800; color: #D95300; line-height: 1.2; margin-bottom: 3px; }
+  .bp-callout-txt { font-size: 12.8px; color: #515154; line-height: 1.42; }
+
   footer {
     margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border);
     font-size: 12.8px; color: var(--gray); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
   }
 
   @media (max-width: 1120px) {
-    .hero-grid, .slide-bento, .two-col, .dl-grid { grid-template-columns: 1fr; }
+    .hero-grid, .slide-bento, .two-col, .dl-grid, .bp-grid { grid-template-columns: 1fr; gap: 24px; }
     .map-card, .map-svg-wrap svg { min-height: 480px; }
   }
   @media (max-width: 600px) {
     .container { padding: 12px 12px 44px; }
     .map-card, .map-svg-wrap svg { min-height: 390px; }
     .map-top-bar, .map-bottom-bar { position: static; margin: 10px; }
-    .section-card { padding: 18px 16px; }
+    .section-card, .bp-card { padding: 18px 16px; }
+    .bp-bar-row { grid-template-columns: 98px 1fr 48px; gap: 8px; }
   }
 </style>
 </head>
@@ -288,6 +334,7 @@
     </div>
     <div class="nav-actions">
       <a class="nav-link" href="#atlas">Europe Map</a>
+      <a class="nav-link" href="#batching-prompts">Batching &amp; Prompts</a>
       <a class="nav-link" href="#sliders">Slide &amp; See</a>
       <a class="nav-link" href="#pareto-section">Pareto Frontier</a>
       <a class="nav-link" href="#model-table-section">13-Model Table</a>
@@ -416,6 +463,64 @@
       </div>
     </aside>
 
+  </section>
+
+  <!-- BATCHING AND PROMPTS HIGHLIGHT SECTION -->
+  <section id="batching-prompts" class="bp-section">
+    <div class="bp-header">
+      <div class="bp-kicker">BATCHING AND PROMPTS</div>
+      <h2>Batching is the cheapest carbon cut</h2>
+      <p class="bp-subtitle">Qwen2.5-3B on the L4. Measured energy falls as the batch grows, while a static token estimator (EcoLogits) stays flat and cannot see the effect.</p>
+    </div>
+
+    <div class="bp-card">
+      <div class="bp-grid">
+        <div class="bp-left">
+          <div class="bp-ctrl-row">
+            <span class="bp-col-label">BATCH SIZE</span>
+            <div class="bp-pills" id="bpBatchPills" role="group" aria-label="Batch size selector">
+              <button type="button" class="bp-pill active" data-bs="1">1</button>
+              <button type="button" class="bp-pill" data-bs="4">4</button>
+              <button type="button" class="bp-pill" data-bs="8">8</button>
+            </div>
+          </div>
+
+          <div class="bp-bars">
+            <div class="bp-bar-row">
+              <div class="bp-bar-lbl" id="bpMeasuredLbl">Measured, bs=1</div>
+              <div class="bp-bar-track"><div class="bp-bar-fill bp-orange" id="bpMeasuredBar" style="width:100%;"></div></div>
+              <div class="bp-bar-val" id="bpMeasuredVal">0.1648</div>
+            </div>
+            <div class="bp-bar-row">
+              <div class="bp-bar-lbl">EcoLogits</div>
+              <div class="bp-bar-track"><div class="bp-bar-fill bp-blue" style="width:19.84%;"></div></div>
+              <div class="bp-bar-val">0.0327</div>
+            </div>
+          </div>
+
+          <div class="bp-caption">Wh per query. The estimator gives the same value at every batch size.</div>
+          <div class="bp-takeaway" id="bpTakeaway">Baseline: one query at a time.</div>
+        </div>
+
+        <div class="bp-right">
+          <div class="bp-col-label" style="margin-bottom:14px;">PROMPT LENGTH</div>
+          <div class="bp-callouts">
+            <div class="bp-callout">
+              <div class="bp-callout-num">1.06 mWh</div>
+              <div class="bp-callout-txt">per generated token. Energy grows linearly with output length (R² = 0.9999).</div>
+            </div>
+            <div class="bp-callout">
+              <div class="bp-callout-num">+52%</div>
+              <div class="bp-callout-txt">energy for chain-of-thought on GSM8K, with no accuracy gain over a concise prompt.</div>
+            </div>
+            <div class="bp-callout">
+              <div class="bp-callout-num">9.2×</div>
+              <div class="bp-callout-txt">energy for DeepSeek-R1 vs. V3 on AG News, for +2 points of accuracy (89% to 91%).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- MIDDLE: 3 SIMPLE "SLIDE & SEE" VISUAL EXPLAINERS -->
@@ -607,11 +712,14 @@ function projLonLat(lon, lat) {
   return [(lon + 11.5) / 43.0 * 920.0, (71.5 - lat) / 36.5 * 620.0];
 }
 
-// Full Native Apple MapKit JS Implementation (PolygonOverlay + 91 Clickable Annotations + Curved Arc + Style Toggle)
-const DEFAULT_MAPKIT_TOKEN = "";
+// Full Native Apple MapKit JS Implementation (PolygonOverlay + 91 Clickable Annotations + CI Badges + Curved Arc + Fallback)
+// Domain-locked ES256 JWT (iss: 9KFU5JY2SA, kid: J5L6K66L29, origin: emregumus1.github.io)
+const DEFAULT_MAPKIT_TOKEN = "eyJhbGciOiJFUzI1NiIsImtpZCI6Iko1TDZLNjZMMjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI5S0ZVNUpZMlNBIiwiaWF0IjoxNzk1MDk4Njk1LCJleHAiOjE4MTA4Nzc1NTUsIm9yaWdpbiI6ImVtcmVndW11czEuZ2l0aHViLmlvIn0.jR2bC_fZWJ1eg6qw_yZXdvE2PKAnKUdeKS-TN-d_CvHx0fAOkVLGzmBhLFchtKt9-DGm92eIEUO8HNpH1tbWrQ";
 let mkMap = null;
 let mkCountryPolys = {};
+let mkCountryLabels = [];
 let mkDcAnnotations = [];
+let lastMkDcKey = "";
 let mkRouteOverlay = null;
 let mkRouteBadge = null;
 let mkTargetBeacon = null;
@@ -635,64 +743,79 @@ function activateAppleMaps(token) {
     return;
   }
   const boot = () => {
-    window.mapkit.init({ authorizationCallback: done => done(token) });
-    const box = document.getElementById("mapkitContainer");
-    box.style.display = "block";
-    document.getElementById("mapSvgWrap").style.display = "none";
-    document.body.classList.add("mk-active");
-    document.getElementById("appleMapsToggle").classList.add("active");
-    state.useMapKit = true;
+    try {
+      let mkInitFailed = false;
+      window.mapkit.addEventListener("error", ev => {
+        mkInitFailed = true;
+        console.warn("Apple MapKit JS fallback to Vector Atlas:", ev);
+        disableAppleMaps();
+      });
+      window.mapkit.init({ authorizationCallback: done => done(token) });
+      if (mkInitFailed) return;
 
-    mkMap = new window.mapkit.Map(box, {
-      center: new window.mapkit.Coordinate(53.0, 10.5),
-      region: new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.5, 10.5), new window.mapkit.CoordinateSpan(28, 34)),
-      mapType: window.mapkit.Map.MapTypes.MutedStandard,
-      showsCompass: window.mapkit.FeatureVisibility.Hidden,
-      showsMapTypeControl: false,
-      showsZoomControl: false,
-      isRotationEnabled: false
-    });
+      const box = document.getElementById("mapkitContainer");
+      box.style.display = "block";
+      document.getElementById("mapSvgWrap").style.display = "none";
+      document.body.classList.add("mk-active");
+      document.getElementById("appleMapsToggle").classList.add("active");
+      state.useMapKit = true;
 
-    // Build country PolygonOverlays once from exported rings
-    DATA.mapPaths.forEach(mp => {
-      if (!mp.rings || !mp.rings.length) return;
-      const iso = mp.iso === "GB" ? "UK" : mp.iso;
-      mkCountryPolys[iso] = [];
-      mp.rings.forEach(ring => {
-        const coords = ring.map(([lo, la]) => new window.mapkit.Coordinate(la, lo));
-        const poly = new window.mapkit.PolygonOverlay(coords, {
-          style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.45, strokeColor: "#6E6E73", lineWidth: 1.2 }),
-          data: { iso }
+      mkMap = new window.mapkit.Map(box, {
+        center: new window.mapkit.Coordinate(53.0, 10.5),
+        region: new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.5, 10.5), new window.mapkit.CoordinateSpan(28, 34)),
+        mapType: window.mapkit.Map.MapTypes.MutedStandard,
+        showsCompass: window.mapkit.FeatureVisibility.Hidden,
+        showsMapTypeControl: false,
+        showsZoomControl: false,
+        isRotationEnabled: false
+      });
+
+      // Build country PolygonOverlays once from exported rings
+      DATA.mapPaths.forEach(mp => {
+        if (!mp.rings || !mp.rings.length) return;
+        const iso = mp.iso === "GB" ? "UK" : mp.iso;
+        mkCountryPolys[iso] = [];
+        mp.rings.forEach(ring => {
+          const coords = ring.map(([lo, la]) => new window.mapkit.Coordinate(la, lo));
+          const poly = new window.mapkit.PolygonOverlay(coords, {
+            style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.45, strokeColor: "#6E6E73", lineWidth: 1.2 }),
+            data: { iso }
+          });
+          mkMap.addOverlay(poly);
+          mkCountryPolys[iso].push(poly);
         });
-        mkMap.addOverlay(poly);
-        mkCountryPolys[iso].push(poly);
       });
-    });
 
-    // Country click detection on Apple Maps
-    mkMap.addEventListener("single-tap", ev => {
-      const coord = mkMap.convertPointOnPageToCoordinate(ev.pointOnPage);
-      let bestIso = null, bestDist = 1e9;
-      Object.values(DATA.countries).forEach(c => {
-        if (c.ciMean === null) return;
-        const d = (c.lat - coord.latitude) ** 2 + (c.lon - coord.longitude) ** 2;
-        if (d < bestDist) { bestDist = d; bestIso = c.country; }
-      });
-      if (bestIso && bestDist < 22) {
-        state.cc = bestIso; state.dcId = null; renderAll();
-      }
-    });
-
-    mkMap.addEventListener("select", ev => {
-      if (ev.annotation && ev.annotation.data && ev.annotation.data.dc) {
-        const d = ev.annotation.data.dc;
-        if (d.country !== "UK") {
-          state.cc = d.country; state.dcId = d.id; renderAll();
+      // Country click detection on Apple Maps
+      mkMap.addEventListener("single-tap", ev => {
+        const coord = mkMap.convertPointOnPageToCoordinate(ev.pointOnPage);
+        let bestIso = null, bestDist = 1e9;
+        Object.values(DATA.countries).forEach(c => {
+          if (c.ciMean === null) return;
+          const d = (c.lat - coord.latitude) ** 2 + (c.lon - coord.longitude) ** 2;
+          if (d < bestDist) { bestDist = d; bestIso = c.country; }
+        });
+        if (bestIso && bestDist < 22) {
+          state.cc = bestIso; state.dcId = null; renderAll();
         }
-      }
-    });
+      });
 
-    renderAll();
+      mkMap.addEventListener("select", ev => {
+        if (ev.annotation && ev.annotation.data) {
+          if (ev.annotation.data.dc) {
+            const d = ev.annotation.data.dc;
+            if (d.country !== "UK") { state.cc = d.country; state.dcId = d.id; renderAll(); }
+          } else if (ev.annotation.data.countryIso) {
+            state.cc = ev.annotation.data.countryIso; state.dcId = null; renderAll();
+          }
+        }
+      });
+
+      renderAll();
+    } catch (err) {
+      console.warn("MapKit init exception, using Vector Atlas:", err);
+      disableAppleMaps();
+    }
   };
 
   if (window.mapkit) { boot(); return; }
@@ -700,6 +823,7 @@ function activateAppleMaps(token) {
   s.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js";
   s.crossOrigin = "anonymous";
   s.onload = boot;
+  s.onerror = () => disableAppleMaps();
   document.head.appendChild(s);
 }
 
@@ -724,33 +848,59 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     const isSel = iso === state.cc || (iso === "UK" && state.cc === "GB");
     const style = new window.mapkit.Style({
       fillColor: fill,
-      fillOpacity: iso === "UK" ? 0.30 : 0.48,
+      fillOpacity: iso === "UK" ? 0.30 : 0.44,
       strokeColor: isSel ? "#1D1D1F" : "#6E6E73",
       lineWidth: isSel ? 2.4 : 1.0
     });
     polys.forEach(p => { p.style = style; });
   });
 
-  // 2. Refresh 91 Datacenter Annotations cleanly when category or selection changes
-  if (mkDcAnnotations.length) mkMap.removeAnnotations(mkDcAnnotations);
-  mkDcAnnotations = [];
-  DATA.dcs.filter(d => state.cat === "all" || d.category === state.cat).forEach(d => {
-    const isSel = d.id === state.dcId;
-    const col = isSel ? "#008040" : d.category === "hyperscaler" ? "#0071E3" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
-    const ann = new window.mapkit.Annotation(
-      new window.mapkit.Coordinate(d.jlat, d.jlon),
+  // 2a. Refresh 91 Datacenter Annotations only when category filter or selected DC changes
+  const dcKey = `${state.cat}|${state.dcId || ""}`;
+  if (dcKey !== lastMkDcKey) {
+    lastMkDcKey = dcKey;
+    if (mkDcAnnotations.length) mkMap.removeAnnotations(mkDcAnnotations);
+    mkDcAnnotations = [];
+    DATA.dcs.filter(d => state.cat === "all" || d.category === state.cat).forEach(d => {
+      const isSel = d.id === state.dcId;
+      const col = isSel ? "#008040" : d.category === "hyperscaler" ? "#0071E3" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
+      const ann = new window.mapkit.Annotation(
+        new window.mapkit.Coordinate(d.jlat, d.jlon),
+        () => {
+          const dot = document.createElement("div");
+          const sz = isSel ? 16 : Math.round(9 + ((d.pue || 1.2) - 1.05) * 18);
+          dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.35);cursor:pointer;`;
+          dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
+          return dot;
+        },
+        { data: { dc: d } }
+      );
+      mkDcAnnotations.push(ann);
+    });
+    mkMap.addAnnotations(mkDcAnnotations);
+  }
+
+  // 2b. Country g/kWh pill annotations matching the Vector Atlas
+  if (mkCountryLabels.length) mkMap.removeAnnotations(mkCountryLabels);
+  mkCountryLabels = [];
+  [["SE",16.5,64.2],["NO",8.2,62.0],["FI",25.6,63.2],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
+    const c = DATA.countries[iso];
+    if (!c) return;
+    const ci = (hour >= 0 && c.diurnal) ? c.diurnal[hour] : c.ciMean;
+    const dark = ci < 45 || ci > 420;
+    const lblAnn = new window.mapkit.Annotation(
+      new window.mapkit.Coordinate(la, lo),
       () => {
-        const dot = document.createElement("div");
-        const sz = isSel ? 16 : Math.round(9 + ((d.pue || 1.2) - 1.05) * 18);
-        dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.35);cursor:pointer;`;
-        dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
-        return dot;
+        const pill = document.createElement("div");
+        pill.style.cssText = `background:${dark ? "rgba(29,29,31,0.84)" : "rgba(255,255,255,0.92)"};color:${dark ? "#FFFFFF" : "#1D1D1F"};font-size:10.5px;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.08);cursor:pointer;`;
+        pill.textContent = `${iso} ${Math.round(ci)}g`;
+        return pill;
       },
-      { data: { dc: d } }
+      { data: { countryIso: iso }, collisionMode: window.mapkit.Annotation.CollisionMode.None }
     );
-    mkDcAnnotations.push(ann);
+    mkCountryLabels.push(lblAnn);
   });
-  mkMap.addAnnotations(mkDcAnnotations);
+  mkMap.addAnnotations(mkCountryLabels);
 
   // 3. Draw curved geodesic Bézier PolylineOverlay arc from Local Node to Sweden
   if (mkRouteOverlay) { mkMap.removeOverlay(mkRouteOverlay); mkRouteOverlay = null; }
@@ -1103,6 +1253,26 @@ document.querySelectorAll("[data-sethw]").forEach(el => el.addEventListener("cli
 }));
 document.querySelectorAll("#countryPills .seg-opt").forEach(b => b.addEventListener("click", () => {
   state.cc = b.dataset.cc; state.dcId = state.cc === "DE" && berlinDc ? berlinDc.id : null; renderAll();
+}));
+
+// =========================================================================
+// BATCHING AND PROMPTS INTERACTIVE CARD (1 / 4 / 8)
+// =========================================================================
+const BP_MODES = {
+  1: { lbl: "Measured, bs=1", wh: "0.1648", w: "100%", msg: "Baseline: one query at a time." },
+  4: { lbl: "Measured, bs=4", wh: "0.0480", w: "29.1%", msg: "3.4× less energy per query — 4 prompts share the GPU." },
+  8: { lbl: "Measured, bs=8", wh: "0.0256", w: "15.5%", msg: "6.4× less energy per query — idle GPU draw is amortized across 8 prompts." }
+};
+document.querySelectorAll("#bpBatchPills .bp-pill").forEach(btn => btn.addEventListener("click", () => {
+  const bs = +btn.dataset.bs;
+  const info = BP_MODES[bs];
+  if (!info) return;
+  document.querySelectorAll("#bpBatchPills .bp-pill").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("bpMeasuredLbl").textContent = info.lbl;
+  document.getElementById("bpMeasuredBar").style.width = info.w;
+  document.getElementById("bpMeasuredVal").textContent = info.wh;
+  document.getElementById("bpTakeaway").textContent = info.msg;
 }));
 
 // =========================================================================
