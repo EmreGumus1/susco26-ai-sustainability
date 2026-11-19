@@ -13,13 +13,15 @@
     --border-soft: #E5E5EA;
     --ink: #1D1D1F;
     --gray: #6E6E73;
-    --blue: #0071E3;
-    --blue-tint: #EEF6FF;
-    --green: #008040;
-    --green-tint: #ECFEF4;
-    --mint: #30D158;
-    --orange: #E35D00;
-    --orange-tint: #FFF4EC;
+    --blue: #007AFF;
+    --blue-tint: rgba(0, 122, 255, 0.11);
+    --green: #248A3D;
+    --green-tint: rgba(52, 199, 89, 0.14);
+    --mint: #34C759;
+    --orange: #FF9500;
+    --orange-text: #D95300;
+    --orange-tint: rgba(255, 149, 0, 0.13);
+    --red: #FF3B30;
     --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
   }
@@ -34,90 +36,88 @@
   /* Sticky Frosted Apple Navbar */
   .nav-wrap {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(245, 245, 247, 0.85);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(210, 210, 215, 0.85);
+    background: rgba(248, 248, 250, 0.78);
+    backdrop-filter: saturate(200%) blur(24px);
+    -webkit-backdrop-filter: saturate(200%) blur(24px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
   .nav-inner {
-    max-width: 1360px; margin: 0 auto; padding: 10px 22px;
+    max-width: 1400px; margin: 0 auto; padding: 9px 22px;
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
   }
   .nav-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 14px; color: var(--ink); }
-  .nav-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+  .nav-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px rgba(52,199,89,0.22); }
   .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .nav-link { font-size: 13px; font-weight: 600; color: var(--gray); padding: 6px 10px; border-radius: 999px; }
-  .nav-link:hover { color: var(--ink); text-decoration: none; background: rgba(0,0,0,0.04); }
+  .nav-link:hover { color: var(--ink); text-decoration: none; background: rgba(0,0,0,0.05); }
   .nav-btn { background: var(--ink); color: #FFF; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; }
   .nav-btn:hover { background: #333336; text-decoration: none; }
 
-  .container { max-width: 1360px; margin: 0 auto; padding: 14px 22px 54px; }
+  .container { max-width: 1360px; margin: 0 auto; padding: 24px 22px 54px; }
 
-  .hero-header {
-    margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 24px;
-  }
-  .kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); }
-  h1 { font-size: clamp(26px, 3.1vw, 38px); line-height: 1.06; font-weight: 800; letter-spacing: -0.03em; margin: 3px 0 4px; }
-  .subtitle { margin: 0; color: var(--gray); font-size: 15px; }
+  .panel-hero-head { padding-bottom: 8px; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+  .kicker { font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); }
+  .panel-hero-head h1 { font-size: 21px; line-height: 1.12; font-weight: 800; letter-spacing: -0.025em; margin: 2px 0 4px; color: var(--ink); }
+  .panel-hero-head .subtitle { margin: 0; color: #3A3A3C; font-size: 12px; line-height: 1.38; }
 
   /* Custom Sleek Apple Slider */
   input[type="range"].apple-slider {
-    -webkit-appearance: none; appearance: none; width: 100%; height: 6px;
-    border-radius: 999px; background: #E5E5EA; outline: none; cursor: pointer;
+    -webkit-appearance: none; appearance: none; width: 100%; height: 5px;
+    border-radius: 999px; background: rgba(120, 120, 128, 0.22); outline: none; cursor: pointer;
   }
   input[type="range"].apple-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+    -webkit-appearance: none; appearance: none; width: 19px; height: 19px;
     border-radius: 50%; background: #FFFFFF; border: 2px solid var(--blue);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.18); cursor: grab; transition: transform 0.12s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.20); cursor: grab; transition: transform 0.12s;
   }
   input[type="range"].apple-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
 
-  /* TOP HERO: HUGE MAP LEFT + TACTILE SLIDER PANEL RIGHT */
-  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(335px, 420px); gap: 16px; align-items: stretch; }
-
-  .map-card {
-    background: #ECF2F8; border: 1px solid var(--border); border-radius: 22px;
-    position: relative; overflow: hidden; min-height: 535px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.045); display: flex; flex-direction: column;
+  /* TOP HERO: FULL-BLEED EDGE-TO-EDGE APPLE MAPS + FLOATING LIQUID GLASS PANEL ON TOP */
+  .hero-stage {
+    position: relative; width: 100%; height: calc(100vh - 52px); min-height: 700px; max-height: 920px;
+    overflow: hidden; background: #CBE6FF; border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
+  .hero-map-viewport { position: absolute; inset: 0; width: 100%; height: 100%; }
   #mapkitContainer { position: absolute; inset: 0; z-index: 1; display: none; }
 
   .map-top-bar {
-    position: absolute; top: 12px; left: 12px; right: 12px; z-index: 12;
+    position: absolute; top: 14px; left: 18px; right: 440px; z-index: 12;
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none;
   }
   .glass-pill-bar {
-    pointer-events: auto; background: rgba(255, 255, 255, 0.90);
-    backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px);
-    border: 1px solid rgba(210, 210, 215, 0.92); border-radius: 999px;
+    pointer-events: auto; background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px);
+    border: 1px solid rgba(255, 255, 255, 0.80); border-radius: 999px;
     padding: 4px 6px; display: inline-flex; align-items: center; gap: 4px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
   }
   .pill-btn {
-    border: none; background: transparent; color: var(--gray); font-family: var(--font-sans);
+    border: none; background: transparent; color: #3A3A3C; font-family: var(--font-sans);
     font-size: 11.8px; font-weight: 600; padding: 5px 10px; border-radius: 999px; cursor: pointer;
     transition: all 0.15s ease; white-space: nowrap;
   }
-  .pill-btn.active { background: var(--ink); color: #FFFFFF; }
-  .pill-btn.play-active { background: var(--green); color: #FFFFFF; }
+  .pill-btn:hover { color: var(--ink); background: rgba(0,0,0,0.05); }
+  .pill-btn.active { background: var(--ink); color: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
+  .pill-btn.play-active { background: var(--mint); color: #1D1D1F; font-weight: 700; }
 
   .map-zoom-col {
-    position: absolute; right: 14px; top: 68px; z-index: 12;
+    position: absolute; left: 18px; bottom: 96px; z-index: 12;
     display: flex; flex-direction: column; gap: 4px;
-    background: rgba(255,255,255,0.9); backdrop-filter: blur(14px);
-    border: 1px solid rgba(210,210,215,0.92); border-radius: 12px; padding: 4px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px);
+    border: 1px solid rgba(255,255,255,0.80); border-radius: 13px; padding: 4px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
   }
   .zoom-btn {
-    width: 28px; height: 28px; border: none; background: transparent; border-radius: 8px;
+    width: 30px; height: 30px; border: none; background: transparent; border-radius: 8px;
     font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  .zoom-btn:hover { background: var(--bg); }
+  .zoom-btn:hover { background: rgba(0,0,0,0.06); }
 
-  .map-svg-wrap { flex: 1; width: 100%; display: flex; position: relative; z-index: 2; cursor: grab; }
+  .map-svg-wrap { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; z-index: 2; cursor: grab; }
   .map-svg-wrap:active { cursor: grabbing; }
-  .map-svg-wrap svg { width: 100%; height: 100%; min-height: 535px; display: block; overflow: hidden; }
+  .map-svg-wrap svg { width: 100%; height: 100%; display: block; overflow: hidden; }
 
   @keyframes dashFlow { to { stroke-dashoffset: -48; } }
   @keyframes pulseRing { 0% { r: 9; opacity: 0.95; } 100% { r: 24; opacity: 0; } }
@@ -125,53 +125,73 @@
   .pulse-circle { animation: pulseRing 1.8s ease-out infinite; }
 
   .map-bottom-bar {
-    position: absolute; bottom: 12px; left: 12px; right: 12px; z-index: 12;
+    position: absolute; bottom: 14px; left: 18px; right: 440px; z-index: 12;
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none;
   }
   .glass-info-pill {
-    pointer-events: auto; background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px);
-    border: 1px solid rgba(210, 210, 215, 0.95); border-radius: 14px;
-    padding: 8px 13px; font-size: 12.4px; color: var(--ink);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    pointer-events: auto; background: rgba(255, 255, 255, 0.74);
+    backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px);
+    border: 1px solid rgba(255, 255, 255, 0.82); border-radius: 14px;
+    padding: 8px 13px; font-size: 12.2px; color: var(--ink);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
-  .grad-bar { width: 78px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #008040, #65B741, #F2D16B, #F59E0B, #D9480F); }
+  .grad-bar { width: 78px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #34C759, #8CE071, #FFCC00, #FF9500, #FF3B30); }
 
-  /* RIGHT TACTILE SLIDER PANEL */
+  /* FLOATING ON-TOP LIQUID GLASS PANEL */
   .simple-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 22px;
-    padding: 16px 18px; box-shadow: 0 4px 24px rgba(0,0,0,0.045);
-    display: flex; flex-direction: column; gap: 11px;
+    position: absolute; top: 14px; right: 18px; bottom: 18px; width: 405px; z-index: 15;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(200%) blur(30px);
+    -webkit-backdrop-filter: saturate(200%) blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 24px;
+    padding: 14px 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    display: flex; flex-direction: column; gap: 9px;
   }
+  .simple-card::-webkit-scrollbar { width: 6px; }
+  .simple-card::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.16); border-radius: 999px; }
   .ctrl-label {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-    color: var(--gray); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    color: #3A3A3C; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;
   }
-  .ctrl-val { font-family: var(--font-mono); color: var(--blue); font-size: 11.5px; font-weight: 700; text-transform: none; }
-  .slider-ticks { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--gray); font-weight: 600; margin-top: 3px; }
+  .ctrl-val { font-family: var(--font-mono); color: var(--blue); font-size: 11px; font-weight: 700; text-transform: none; }
+  .slider-ticks { display: flex; justify-content: space-between; font-size: 10px; color: var(--gray); font-weight: 600; margin-top: 2px; }
   .slider-ticks span { cursor: pointer; }
   .slider-ticks span:hover { color: var(--blue); }
 
-  .seg-row { display: flex; background: var(--bg); padding: 3px; border-radius: 11px; border: 1px solid var(--border-soft); gap: 3px; }
+  .seg-row { display: flex; background: rgba(120, 120, 128, 0.14); padding: 3px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.45); gap: 3px; }
   .seg-opt {
-    flex: 1; border: none; background: transparent; color: var(--gray); font-family: var(--font-sans);
-    font-size: 12px; font-weight: 600; padding: 6px 6px; border-radius: 8px; cursor: pointer; transition: all 0.14s ease; white-space: nowrap;
+    flex: 1; border: none; background: transparent; color: #3A3A3C; font-family: var(--font-sans);
+    font-size: 12px; font-weight: 600; padding: 5px 6px; border-radius: 8px; cursor: pointer; transition: all 0.14s ease; white-space: nowrap;
   }
-  .seg-opt.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.09); }
+  .seg-opt.active { background: #FFFFFF; color: var(--ink); box-shadow: 0 2px 6px rgba(0,0,0,0.11); }
 
-  .verdict-card { background: var(--ink); color: #FFFFFF; border-radius: 16px; padding: 13px 15px; }
+  .verdict-card {
+    background: rgba(28, 28, 30, 0.86);
+    backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #FFFFFF; border-radius: 16px; padding: 12px 14px;
+  }
   .verdict-tag { display: inline-block; background: var(--mint); color: var(--ink); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
-  .verdict-card.cloud-mode .verdict-tag { background: #64D2FF; }
-  .verdict-title { margin: 5px 0 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
-  .hero-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 7px 0; border-top: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); }
-  .hm-val { font-size: 16.5px; font-weight: 800; font-family: var(--font-mono); color: #FFFFFF; }
-  .hm-lbl { font-size: 10.5px; color: #AEAEB2; margin-top: 1px; }
-  .verdict-why { margin: 7px 0 0; font-size: 12.2px; color: #E5E5EA; line-height: 1.38; }
+  .verdict-card.cloud-mode .verdict-tag { background: #5AC8FA; }
+  .verdict-title { margin: 5px 0 7px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.18; }
+  .hero-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14); }
+  .hm-val { font-size: 15.5px; font-weight: 800; font-family: var(--font-mono); color: #FFFFFF; }
+  .hm-lbl { font-size: 10px; color: #C7C7CC; margin-top: 1px; }
+  .verdict-why { margin: 6px 0 0; font-size: 11.8px; color: #E5E5EA; line-height: 1.35; }
 
+  .bars-glass {
+    background: rgba(255, 255, 255, 0.50);
+    border: 1px solid rgba(255, 255, 255, 0.68);
+    border-radius: 14px; padding: 10px 12px;
+  }
   .bars-wrap { display: flex; flex-direction: column; gap: 5px; }
   .bar-row { display: flex; flex-direction: column; gap: 3px; }
-  .bar-top { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; }
-  .bar-track { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--border-soft); }
+  .bar-top { display: flex; justify-content: space-between; font-size: 11.8px; font-weight: 600; }
+  .bar-track { height: 7px; background: rgba(120,120,128,0.14); border-radius: 999px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 999px; transition: width 0.22s ease; }
 
   /* MIDDLE: 3 SIMPLE "SLIDE TO UNDERSTAND" VISUAL CARDS */
@@ -291,7 +311,7 @@
   .bp-bar-lbl { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; }
   .bp-bar-track { height: 28px; border-radius: 8px; background: #F2F2F7; overflow: hidden; }
   .bp-bar-fill { height: 100%; border-radius: 8px; transition: width 0.25s cubic-bezier(.22,.9,.32,1); }
-  .bp-bar-fill.bp-orange { background: var(--orange); }
+  .bp-bar-fill.bp-orange { background: #FF6B00; }
   .bp-bar-fill.bp-blue { background: var(--blue); }
   .bp-bar-val { font-size: 13.5px; font-weight: 800; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
   .bp-caption { margin-top: 14px; font-size: 12.2px; color: var(--gray); }
@@ -301,7 +321,7 @@
   }
   .bp-callouts { display: flex; flex-direction: column; gap: 12px; }
   .bp-callout { background: #FDF0E6; border-radius: 14px; padding: 14px 18px; }
-  .bp-callout-num { font-size: 20px; font-weight: 800; color: #D95300; line-height: 1.2; margin-bottom: 3px; }
+  .bp-callout-num { font-size: 20px; font-weight: 800; color: var(--orange-text); line-height: 1.2; margin-bottom: 3px; }
   .bp-callout-txt { font-size: 12.8px; color: #515154; line-height: 1.42; }
 
   /* DARK COLAB & QR CTA BANNER AT BOTTOM */
@@ -318,18 +338,18 @@
   .colab-sub { margin: 0 0 24px; font-size: 15.5px; color: #AEAEB2; line-height: 1.5; }
   .colab-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .colab-open-btn {
-    background: #30D158; color: #1D1D1F; font-size: 14.5px; font-weight: 700;
+    background: var(--mint); color: #1D1D1F; font-size: 14.5px; font-weight: 700;
     padding: 12px 22px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px;
     transition: transform 0.15s ease, background 0.15s ease;
   }
-  .colab-open-btn:hover { background: #3DE066; text-decoration: none; transform: translateY(-1px); }
+  .colab-open-btn:hover { background: #46D369; text-decoration: none; transform: translateY(-1px); }
   .colab-copy-btn {
     background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.22);
     font-family: var(--font-sans); font-size: 14.5px; font-weight: 700;
     padding: 12px 22px; border-radius: 999px; cursor: pointer; transition: all 0.15s ease;
   }
   .colab-copy-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.45); }
-  .colab-copy-btn.copied { border-color: #30D158; color: #30D158; }
+  .colab-copy-btn.copied { border-color: var(--mint); color: var(--mint); }
   .colab-url-text { margin-top: 16px; font-size: 12.2px; color: #8E8E93; font-family: var(--font-mono); word-break: break-all; }
   .colab-qr-card {
     background: #FFFFFF; border-radius: 20px; padding: 16px 16px 12px;
@@ -345,13 +365,20 @@
   }
 
   @media (max-width: 1120px) {
-    .hero-grid, .slide-bento, .two-col, .dl-grid, .bp-grid { grid-template-columns: 1fr; gap: 24px; }
-    .map-card, .map-svg-wrap svg { min-height: 480px; }
+    .slide-bento, .two-col, .dl-grid, .bp-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 1024px) {
+    .hero-stage { height: auto; min-height: 0; max-height: none; display: flex; flex-direction: column; }
+    .hero-map-viewport { position: relative; height: 520px; width: 100%; }
+    .map-top-bar, .map-bottom-bar { right: 14px; left: 14px; }
+    .map-zoom-col { left: 14px; bottom: 92px; }
+    .simple-card { position: static; width: auto; max-height: none; margin: 12px 14px 16px; }
   }
   @media (max-width: 600px) {
-    .container { padding: 12px 12px 44px; }
-    .map-card, .map-svg-wrap svg { min-height: 390px; }
+    .container { padding: 14px 12px 44px; }
+    .hero-map-viewport { height: 430px; }
     .map-top-bar, .map-bottom-bar { position: static; margin: 10px; }
+    .map-zoom-col { display: none; }
     .section-card, .bp-card { padding: 18px 16px; }
     .bp-bar-row { grid-template-columns: 98px 1fr 48px; gap: 8px; }
     .colab-banner { padding: 28px 22px; gap: 24px; }
@@ -379,127 +406,125 @@
   </div>
 </nav>
 
-<main class="container">
+<!-- FULL-BLEED APPLE MAPS HERO STAGE + FLOATING LIQUID GLASS PANEL -->
+<section id="atlas" class="hero-stage">
 
-  <header class="hero-header">
-    <div>
-      <div class="kicker">1st Workshop on Sustainable Computing · SusCo26</div>
+  <div class="hero-map-viewport">
+    <div id="mapkitContainer"></div>
+
+    <div class="map-top-bar">
+      <div class="glass-pill-bar" id="pinFilter">
+        <button class="pill-btn active" data-cat="all">All 91 DCs</button>
+        <button class="pill-btn" data-cat="hyperscaler">Hyperscaler</button>
+        <button class="pill-btn" data-cat="european cloud">EU Cloud</button>
+        <button class="pill-btn" data-cat="colocation">Colo</button>
+        <span style="width:1px;height:16px;background:rgba(0,0,0,0.14);margin:0 2px;"></span>
+        <button class="pill-btn" id="appleMapsToggle" title="Switch to Live Apple Maps (MapKit JS)"> Apple Maps</button>
+      </div>
+
+      <div class="glass-pill-bar mk-style-bar" id="mkStyleBar">
+        <button class="pill-btn active" data-mktype="standard">Standard</button>
+        <button class="pill-btn" data-mktype="muted">Muted</button>
+        <button class="pill-btn" data-mktype="hybrid">Satellite</button>
+      </div>
+
+      <div class="glass-pill-bar" style="gap:8px;padding:4px 10px;">
+        <button class="pill-btn active" id="meanTimeBtn">2025 Mean</button>
+        <span style="font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;" id="mapHourBadge">Mean</span>
+        <input type="range" class="apple-slider" id="mapHourSlider" min="-1" max="23" step="1" value="-1" style="width:110px;" aria-label="Hour of day slider"/>
+        <button class="pill-btn" id="playBtn">▶ 24h</button>
+      </div>
+    </div>
+
+    <div class="map-zoom-col">
+      <button class="zoom-btn" id="zoomInBtn" title="Zoom in">+</button>
+      <button class="zoom-btn" id="zoomOutBtn" title="Zoom out">−</button>
+      <button class="zoom-btn" id="zoomResetBtn" title="Reset view" style="font-size:12px;">↺</button>
+    </div>
+
+    <div class="map-svg-wrap" id="mapSvgWrap">
+      <svg id="europeSvg" viewBox="0 0 920 620" preserveAspectRatio="xMidYMid meet" aria-label="Interactive European Carbon & Datacenter Map"></svg>
+    </div>
+
+    <div class="mk-modal-backdrop" id="mkModal">
+      <div class="mk-modal">
+        <div class="kicker">Live Apple Maps (MapKit JS)</div>
+        <h3 style="margin:4px 0 6px;font-size:20px;font-weight:800;">Connect Your Apple Developer MapKit Key</h3>
+        <p style="margin:0;font-size:13px;color:var(--gray);line-height:1.45;">
+          Apple Developer Team ID: <code style="color:var(--ink);font-weight:700;">9KFU5JY2SA</code>.<br/>
+          Paste a signed MapKit JS JWT below to activate live Apple Maps tiles with all 91 datacenters, 2025 hourly country polygons, and Sweden escalation arcs:
+        </p>
+        <textarea id="mkTokenInput" placeholder="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ii4uLiJ9..."></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+          <button class="pill-btn" id="mkCancelBtn" style="border:1px solid var(--border);padding:7px 14px;">Keep Vector Map</button>
+          <button class="pill-btn active" id="mkSaveBtn" style="padding:7px 16px;">Save &amp; Enable  Apple Maps</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-bottom-bar">
+      <div class="glass-info-pill" id="mapSelectionPill">
+        <span>Selected: <strong>Germany · maincubes BER01</strong></span>
+      </div>
+      <div class="glass-info-pill" style="gap:8px;font-size:11.6px;font-weight:600;">
+        <span>25g</span><span class="grad-bar"></span><span>600g+</span>
+        <span style="border-left:1px solid rgba(0,0,0,0.14);padding-left:8px;"><span style="color:var(--green);">●</span> Local</span>
+        <span><span style="color:var(--blue);">┈▶</span> Sweden Cloud</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING LIQUID GLASS CONTROL PANEL ON TOP OF APPLE MAPS -->
+  <aside class="simple-card" aria-label="Interactive Carbon & Latency Controls">
+    <div class="panel-hero-head">
+      <div class="kicker">SusCo26 · TU Berlin</div>
       <h1>When Should You Run AI Locally?</h1>
-      <p class="subtitle">Click any country or datacenter on the map, or drag the sliders to see when Local GPU, Clean Nordic Cloud, or Hybrid Routing wins.</p>
+      <p class="subtitle">Click Europe or slide to see when Local, Cloud, or Hybrid routing wins.</p>
     </div>
-  </header>
 
-  <!-- HERO: HUGE EUROPE MAP LEFT + SLIDE-TO-EXPLORE PANEL RIGHT -->
-  <section id="atlas" class="hero-grid">
-
-    <div class="map-card">
-      <div id="mapkitContainer"></div>
-
-      <div class="map-top-bar">
-        <div class="glass-pill-bar" id="pinFilter">
-          <button class="pill-btn active" data-cat="all">All 91 DCs</button>
-          <button class="pill-btn" data-cat="hyperscaler">Hyperscaler</button>
-          <button class="pill-btn" data-cat="european cloud">EU Cloud</button>
-          <button class="pill-btn" data-cat="colocation">Colo</button>
-          <span style="width:1px;height:16px;background:var(--border);margin:0 2px;"></span>
-          <button class="pill-btn" id="appleMapsToggle" title="Switch to Live Apple Maps (MapKit JS)"> Apple Maps</button>
-        </div>
-
-        <div class="glass-pill-bar mk-style-bar" id="mkStyleBar">
-          <button class="pill-btn active" data-mktype="muted">Muted</button>
-          <button class="pill-btn" data-mktype="standard">Standard</button>
-          <button class="pill-btn" data-mktype="hybrid">Satellite</button>
-        </div>
-
-        <div class="glass-pill-bar" style="gap:8px;padding:4px 10px;">
-          <button class="pill-btn active" id="meanTimeBtn">2025 Mean</button>
-          <span style="font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;" id="mapHourBadge">Mean</span>
-          <input type="range" class="apple-slider" id="mapHourSlider" min="-1" max="23" step="1" value="-1" style="width:118px;" aria-label="Hour of day slider"/>
-          <button class="pill-btn" id="playBtn">▶ 24h</button>
-        </div>
-      </div>
-
-      <div class="map-zoom-col">
-        <button class="zoom-btn" id="zoomInBtn" title="Zoom in">+</button>
-        <button class="zoom-btn" id="zoomOutBtn" title="Zoom out">−</button>
-        <button class="zoom-btn" id="zoomResetBtn" title="Reset view" style="font-size:12px;">↺</button>
-      </div>
-
-      <div class="map-svg-wrap" id="mapSvgWrap">
-        <svg id="europeSvg" viewBox="0 0 920 620" preserveAspectRatio="xMidYMid meet" aria-label="Interactive European Carbon & Datacenter Map"></svg>
-      </div>
-
-      <div class="mk-modal-backdrop" id="mkModal">
-        <div class="mk-modal">
-          <div class="kicker">Live Apple Maps (MapKit JS)</div>
-          <h3 style="margin:4px 0 6px;font-size:20px;font-weight:800;">Connect Your Apple Developer MapKit Key</h3>
-          <p style="margin:0;font-size:13px;color:var(--gray);line-height:1.45;">
-            Detected Apple Developer Team ID: <code style="color:var(--ink);font-weight:700;">9KFU5JY2SA</code>.<br/>
-            Paste a signed MapKit JS JWT below to activate live Apple Maps tiles (250k free views/day) with all 91 datacenters, 2025 hourly country polygons, and Sweden escalation arcs:
-          </p>
-          <textarea id="mkTokenInput" placeholder="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ii4uLiJ9..."></textarea>
-          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
-            <button class="pill-btn" id="mkCancelBtn" style="border:1px solid var(--border);padding:7px 14px;">Keep Vector Map</button>
-            <button class="pill-btn active" id="mkSaveBtn" style="padding:7px 16px;">Save &amp; Enable  Apple Maps</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="map-bottom-bar">
-        <div class="glass-info-pill" id="mapSelectionPill">
-          <span>Selected: <strong>Germany · maincubes BER01</strong></span>
-        </div>
-        <div class="glass-info-pill" style="gap:8px;font-size:11.6px;font-weight:600;">
-          <span>25g</span><span class="grad-bar"></span><span>600g+</span>
-          <span style="border-left:1px solid var(--border);padding-left:8px;"><span style="color:var(--green);">●</span> Local</span>
-          <span><span style="color:var(--blue);">┈▶</span> Sweden Cloud</span>
-        </div>
+    <div>
+      <div class="ctrl-label"><span>1. Slide Task Complexity</span><span class="ctrl-val" id="mixBadge">50% Routine / 50% Math</span></div>
+      <input type="range" class="apple-slider" id="mixSlider" min="0" max="100" step="5" value="50" />
+      <div class="slider-ticks">
+        <span data-setmix="0">Routine News (0%)</span>
+        <span data-setmix="50">50/50 Mix</span>
+        <span data-setmix="100">Hard Math (100%)</span>
       </div>
     </div>
 
-    <!-- RIGHT PANEL: 2 SMOOTH SLIDERS + COUNTRY PILLS + VERDICT + 4 BARS -->
-    <aside class="simple-card">
-      <div>
-        <div class="ctrl-label"><span>1. Slide Task Complexity</span><span class="ctrl-val" id="mixBadge">50% Routine / 50% Math</span></div>
-        <input type="range" class="apple-slider" id="mixSlider" min="0" max="100" step="5" value="50" />
-        <div class="slider-ticks">
-          <span data-setmix="0">Routine News (0%)</span>
-          <span data-setmix="50">50/50 Mix</span>
-          <span data-setmix="100">Hard Math (100%)</span>
-        </div>
+    <div>
+      <div class="ctrl-label"><span>2. Slide Hardware &amp; Batching</span><span class="ctrl-val" id="hwBadge">Batched GPU (bs=8)</span></div>
+      <input type="range" class="apple-slider" id="hwSlider" min="0" max="3" step="1" value="3" />
+      <div class="slider-ticks">
+        <span data-sethw="0">CPU only</span>
+        <span data-sethw="1">GPU bs=1</span>
+        <span data-sethw="2">GPU bs=4</span>
+        <span data-sethw="3">GPU bs=8</span>
       </div>
+    </div>
 
-      <div>
-        <div class="ctrl-label"><span>2. Slide Hardware &amp; Batching</span><span class="ctrl-val" id="hwBadge">Batched GPU (bs=8)</span></div>
-        <input type="range" class="apple-slider" id="hwSlider" min="0" max="3" step="1" value="3" />
-        <div class="slider-ticks">
-          <span data-sethw="0">CPU only</span>
-          <span data-sethw="1">GPU bs=1</span>
-          <span data-sethw="2">GPU bs=4</span>
-          <span data-sethw="3">GPU bs=8</span>
-        </div>
+    <div>
+      <div class="ctrl-label"><span>3. Country (or Click Map)</span><span class="ctrl-val" id="gridBadge">DE · 366 g/kWh</span></div>
+      <div class="seg-row" id="countryPills">
+        <button class="seg-opt active" data-cc="DE">DE</button>
+        <button class="seg-opt" data-cc="SE">SE</button>
+        <button class="seg-opt" data-cc="PL">PL</button>
+        <button class="seg-opt" data-cc="FR">FR</button>
+        <button class="seg-opt" data-cc="CH">CH</button>
       </div>
+    </div>
 
-      <div>
-        <div class="ctrl-label"><span>3. Country (or Click Europe Map)</span><span class="ctrl-val" id="gridBadge">DE · 366 g/kWh</span></div>
-        <div class="seg-row" id="countryPills">
-          <button class="seg-opt active" data-cc="DE">DE</button>
-          <button class="seg-opt" data-cc="SE">SE</button>
-          <button class="seg-opt" data-cc="PL">PL</button>
-          <button class="seg-opt" data-cc="FR">FR</button>
-          <button class="seg-opt" data-cc="CH">CH</button>
-        </div>
-      </div>
+    <div class="verdict-card" id="verdictCard"></div>
 
-      <div class="verdict-card" id="verdictCard"></div>
+    <div class="bars-glass">
+      <div class="ctrl-label" style="margin-bottom:6px;"><span>Emissions per 1,000 Queries</span><span class="ctrl-val" style="color:#3A3A3C;" id="waterTag">Water: —</span></div>
+      <div class="bars-wrap" id="fourBars"></div>
+    </div>
+  </aside>
 
-      <div>
-        <div class="ctrl-label" style="margin-bottom:6px;"><span>Emissions per 1,000 Queries</span><span class="ctrl-val" style="color:var(--gray);" id="waterTag">Water: —</span></div>
-        <div class="bars-wrap" id="fourBars"></div>
-      </div>
-    </aside>
+</section>
 
-  </section>
+<main class="container">
 
   <!-- BATCHING AND PROMPTS HIGHLIGHT SECTION -->
   <section id="batching-prompts" class="bp-section">
@@ -750,7 +775,7 @@ function hideTT() { tt.style.opacity = "0"; }
 
 function ciColor(ci) {
   if (ci === null || ci === undefined) return "#E5E5EA";
-  const stops = [[25,[0,128,64]],[130,[101,183,65]],[260,[242,209,107]],[400,[245,158,11]],[610,[217,72,15]]];
+  const stops = [[25,[52,199,89]],[130,[140,224,113]],[260,[255,204,0]],[400,[255,149,0]],[610,[255,59,48]]];
   const t = Math.max(25, Math.min(610, ci));
   for (let i = 0; i < stops.length - 1; i++) {
     const [x0, c0] = stops[i], [x1, c1] = stops[i+1];
@@ -759,7 +784,7 @@ function ciColor(ci) {
       return `rgb(${Math.round(c0[0]+f*(c1[0]-c0[0]))},${Math.round(c0[1]+f*(c1[1]-c0[1]))},${Math.round(c0[2]+f*(c1[2]-c0[2]))})`;
     }
   }
-  return "rgb(217,72,15)";
+  return "rgb(255,59,48)";
 }
 function projLonLat(lon, lat) {
   return [(lon + 11.5) / 43.0 * 920.0, (71.5 - lat) / 36.5 * 620.0];
@@ -814,9 +839,9 @@ function activateAppleMaps(token) {
       state.useMapKit = true;
 
       mkMap = new window.mapkit.Map(box, {
-        center: new window.mapkit.Coordinate(53.0, 10.5),
-        region: new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.5, 10.5), new window.mapkit.CoordinateSpan(28, 34)),
-        mapType: window.mapkit.Map.MapTypes.MutedStandard,
+        center: new window.mapkit.Coordinate(53.2, 16.0),
+        region: new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.2, 16.0), new window.mapkit.CoordinateSpan(26, 38)),
+        mapType: window.mapkit.Map.MapTypes.Standard,
         showsCompass: window.mapkit.FeatureVisibility.Hidden,
         showsMapTypeControl: false,
         showsZoomControl: false,
@@ -831,7 +856,7 @@ function activateAppleMaps(token) {
         mp.rings.forEach(ring => {
           const coords = ring.map(([lo, la]) => new window.mapkit.Coordinate(la, lo));
           const poly = new window.mapkit.PolygonOverlay(coords, {
-            style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.45, strokeColor: "#6E6E73", lineWidth: 1.2 }),
+            style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.18, strokeColor: "rgba(0, 122, 255, 0.28)", lineWidth: 0.8 }),
             data: { iso }
           });
           mkMap.addOverlay(poly);
@@ -893,7 +918,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
   if (!mkMap || !window.mapkit || !state.useMapKit) return;
   const hour = state.hour;
 
-  // 1. Update country PolygonOverlay fill & border colors dynamically
+  // 1. Update country PolygonOverlay fill & border colors dynamically (delicate Apple tint)
   Object.entries(mkCountryPolys).forEach(([iso, polys]) => {
     const c = DATA.countries[iso];
     const ci = (c && hour >= 0 && c.diurnal) ? c.diurnal[hour] : (c ? c.ciMean : null);
@@ -901,9 +926,9 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     const isSel = iso === state.cc || (iso === "UK" && state.cc === "GB");
     const style = new window.mapkit.Style({
       fillColor: fill,
-      fillOpacity: iso === "UK" ? 0.30 : 0.44,
-      strokeColor: isSel ? "#1D1D1F" : "#6E6E73",
-      lineWidth: isSel ? 2.4 : 1.0
+      fillOpacity: iso === "UK" ? 0.14 : (isSel ? 0.28 : 0.18),
+      strokeColor: isSel ? "#007AFF" : "rgba(0, 122, 255, 0.28)",
+      lineWidth: isSel ? 2.4 : 0.8
     });
     polys.forEach(p => { p.style = style; });
   });
@@ -916,13 +941,13 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     mkDcAnnotations = [];
     DATA.dcs.filter(d => state.cat === "all" || d.category === state.cat).forEach(d => {
       const isSel = d.id === state.dcId;
-      const col = isSel ? "#008040" : d.category === "hyperscaler" ? "#0071E3" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
+      const col = isSel ? "#248A3D" : d.category === "hyperscaler" ? "#007AFF" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
       const ann = new window.mapkit.Annotation(
         new window.mapkit.Coordinate(d.jlat, d.jlon),
         () => {
           const dot = document.createElement("div");
           const sz = isSel ? 16 : Math.round(9 + ((d.pue || 1.2) - 1.05) * 18);
-          dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.35);cursor:pointer;`;
+          dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.32);cursor:pointer;`;
           dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
           return dot;
         },
@@ -933,7 +958,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     mkMap.addAnnotations(mkDcAnnotations);
   }
 
-  // 2b. Country g/kWh pill annotations matching the Vector Atlas
+  // 2b. Frosted Liquid Glass Country g/kWh pill annotations
   if (mkCountryLabels.length) mkMap.removeAnnotations(mkCountryLabels);
   mkCountryLabels = [];
   [["SE",16.5,64.2],["NO",8.2,62.0],["FI",25.6,63.2],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
@@ -945,7 +970,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
       new window.mapkit.Coordinate(la, lo),
       () => {
         const pill = document.createElement("div");
-        pill.style.cssText = `background:${dark ? "rgba(29,29,31,0.84)" : "rgba(255,255,255,0.92)"};color:${dark ? "#FFFFFF" : "#1D1D1F"};font-size:10.5px;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.08);cursor:pointer;`;
+        pill.style.cssText = `background:${dark ? "rgba(28,28,30,0.82)" : "rgba(255,255,255,0.82)"};backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);color:${dark ? "#FFFFFF" : "#1D1D1F"};font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.16);border:1px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.9)"};cursor:pointer;`;
         pill.textContent = `${iso} ${Math.round(ci)}g`;
         return pill;
       },
@@ -974,7 +999,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     mkRouteOverlay = new window.mapkit.PolylineOverlay(arcCoords, {
       style: new window.mapkit.Style({
         lineWidth: 3.5,
-        strokeColor: escPct === 100 ? "#E35D00" : "#0071E3",
+        strokeColor: escPct === 100 ? "#FF9500" : "#007AFF",
         lineDash: [8, 6]
       })
     });
@@ -982,7 +1007,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
 
     mkRouteBadge = new window.mapkit.Annotation(new window.mapkit.Coordinate(midLat, midLon), () => {
       const el = document.createElement("div");
-      el.style.cssText = "background:rgba(29,29,31,0.92);color:#30D158;font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.28);pointer-events:none;";
+      el.style.cssText = "background:rgba(28,28,30,0.82);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border:1px solid rgba(255,255,255,0.20);color:#34C759;font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,0.24);pointer-events:none;";
       el.textContent = `${escPct}% Cloud → Sweden`;
       return el;
     });
@@ -990,7 +1015,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
 
     mkTargetBeacon = new window.mapkit.Annotation(new window.mapkit.Coordinate(se.lat, se.lon), () => {
       const el = document.createElement("div");
-      el.style.cssText = "width:16px;height:16px;border-radius:50%;background:#0071E3;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35);";
+      el.style.cssText = "width:16px;height:16px;border-radius:50%;background:#007AFF;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35);";
       return el;
     });
     mkMap.addAnnotation(mkTargetBeacon);
@@ -1113,10 +1138,10 @@ function renderAll() {
   `;
 
   const bars = [
-    { label: "Smart Hybrid Router (→ SE)", co2: routerCo2, acc: routerAcc, col: "#008040" },
-    { label: state.hwStop === 0 ? "100% Local (CPU)" : "100% Local (Ministral L4)", co2: localCo2, acc: localAcc, col: state.hwStop >= 2 ? "#10B981" : "#E35D00" },
-    { label: "Sweden Cloud (DeepSeek-V3)", co2: cloudV3SeCo2, acc: cloudV3Acc, col: "#0071E3" },
-    { label: `Reasoning Cloud R1 (${state.cc})`, co2: cloudR1Co2, acc: cloudR1Acc, col: "#E35D00" },
+    { label: "Smart Hybrid Router (→ SE)", co2: routerCo2, acc: routerAcc, col: "#248A3D" },
+    { label: state.hwStop === 0 ? "100% Local (CPU)" : "100% Local (Ministral L4)", co2: localCo2, acc: localAcc, col: state.hwStop >= 2 ? "#34C759" : "#FF9500" },
+    { label: "Sweden Cloud (DeepSeek-V3)", co2: cloudV3SeCo2, acc: cloudV3Acc, col: "#007AFF" },
+    { label: `Reasoning Cloud R1 (${state.cc})`, co2: cloudR1Co2, acc: cloudR1Acc, col: "#FF9500" },
   ];
   const maxB = Math.max(...bars.map(b => b.co2), 1);
   document.getElementById("waterTag").textContent = `Water: ${(winner.wh * 1.80).toFixed(2)} L/1k`;
@@ -1246,7 +1271,7 @@ document.getElementById("zoomOutBtn").addEventListener("click", () => {
 });
 document.getElementById("zoomResetBtn").addEventListener("click", () => {
   if (state.useMapKit && mkMap) {
-    mkMap.setRegionAnimated(new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.5, 10.5), new window.mapkit.CoordinateSpan(28, 34)));
+    mkMap.setRegionAnimated(new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.2, 16.0), new window.mapkit.CoordinateSpan(26, 38)));
   } else {
     state.zoom = 1; state.panX = 0; state.panY = 0; renderAll();
   }
@@ -1413,14 +1438,14 @@ function drawPareto() {
     const acc = isGsm ? m.gsmAcc : m.agAcc, wh = isGsm ? m.gsmWh : m.agWh;
     if (acc > bestAcc) { bestAcc = acc; paretoPts.push(`${sx(wh)},${sy(acc)}`); }
   });
-  if (paretoPts.length > 1) out += `<polyline points="${paretoPts.join(" ")}" fill="none" stroke="#008040" stroke-width="2.2" stroke-dasharray="6,4" opacity="0.65"/>`;
+  if (paretoPts.length > 1) out += `<polyline points="${paretoPts.join(" ")}" fill="none" stroke="#248A3D" stroke-width="2.2" stroke-dasharray="6,4" opacity="0.65"/>`;
 
   const og = {"ministral-l4": [22, -26, "start"], "qwen-0.5b": [0, -14, "middle"], "qwen-1.5b": [0, -14, "middle"], "qwen-3b": [-14, 4, "end"], "gemma-4b": [0, -14, "middle"], "qwen-7b": [-14, 4, "end"], "lfm2-8b": [0, -14, "middle"], "qwen-14b": [14, 18, "start"], "ministral-cpu": [-22, -26, "end"], "deepseek-v3": [0, -14, "middle"], "deepseek-r1": [0, -14, "middle"], "gemini-flash": [14, 18, "start"], "gemini-pro": [-14, 4, "end"]};
   const oa = {"gemma-4b": [-14, 4, "end"], "lfm2-8b": [16, 16, "start"], "qwen-7b": [-6, -21, "middle"], "qwen-14b": [14, 0, "start"], "qwen-1.5b": [8, 31, "start"], "deepseek-v3": [14, 0, "start"], "qwen-3b": [27, 47, "start"], "deepseek-r1": [-19, -11, "end"], "gemini-flash": [-12, 7, "end"], "ministral-l4": [14, 0, "start"], "qwen-0.5b": [14, 0, "start"]};
 
   items.forEach(m => {
     const wh = isGsm ? m.gsmWh : m.agWh, acc = isGsm ? m.gsmAcc : m.agAcc, px = sx(wh), py = sy(acc);
-    const col = m.cat==="Local"?"#008040":m.cat==="Cloud"?"#0071E3":m.cat==="Overhead"?"#E35D00":"#6E6E73";
+    const col = m.cat==="Local"?"#248A3D":m.cat==="Cloud"?"#007AFF":m.cat==="Overhead"?"#FF9500":"#6E6E73";
     const isSel = m.id === state.selectedModelId, r = isSel ? 9 : 6;
     if (isSel) out += `<circle cx="${px}" cy="${py}" r="14" fill="${col}" opacity="0.18"/>`;
     const short = m.name.replace(" (L4 Ollama)","").replace(" (Ref)","*").replace("Liquid ","");
