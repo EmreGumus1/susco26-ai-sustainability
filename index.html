@@ -136,7 +136,22 @@
     box-shadow: 0 8px 26px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
-  .grad-bar { width: 78px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #34C759, #8CE071, #FFCC00, #FF9500, #FF3B30); }
+  .grad-bar { width: 78px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #00C878, #8CD600, #FFD60A, #FF8C00, #E61E3C); }
+
+  .hybrid-toggle {
+    display: flex; align-items: center; gap: 9px; width: 100%; cursor: pointer;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.75);
+    border-radius: 14px; padding: 10px 13px; font-family: var(--font-sans);
+    font-size: 12.5px; font-weight: 700; color: var(--ink); text-align: left;
+    transition: all 0.15s ease;
+  }
+  .hybrid-toggle:hover { background: rgba(255,255,255,0.8); }
+  .hybrid-toggle .hy-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(120,120,128,0.45); flex-shrink: 0; }
+  .hybrid-toggle .hy-label { flex: 1; }
+  .hybrid-toggle .hy-arrow { color: var(--blue); font-weight: 800; }
+  .hybrid-toggle.on { background: rgba(0,122,255,0.12); border-color: rgba(0,122,255,0.35); }
+  .hybrid-toggle.on .hy-dot { background: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.2); }
+  .hybrid-note { margin: 0; font-size: 11.8px; line-height: 1.42; color: #3A3A3C; padding: 0 4px; }
 
   /* FLOATING ON-TOP LIQUID GLASS PANEL */
   .simple-card {
@@ -440,7 +455,7 @@
     <div class="panel-hero-head">
       <div class="kicker">SusCo26 · TU Berlin</div>
       <h1>When Should You Run AI Locally?</h1>
-      <p class="subtitle">Click Europe or slide to see when Local, Cloud, or Hybrid routing wins.</p>
+      <p class="subtitle">Pick a country on the map and slide to see the greenest place to run AI.</p>
     </div>
 
     <div>
@@ -481,6 +496,11 @@
       <div class="ctrl-label" style="margin-bottom:6px;"><span>Emissions per 1,000 Queries</span><span class="ctrl-val" style="color:#3A3A3C;" id="waterTag">Water: —</span></div>
       <div class="bars-wrap" id="fourBars"></div>
     </div>
+
+    <button type="button" class="hybrid-toggle" id="hybridToggle" aria-pressed="false">
+      <span class="hy-dot"></span><span class="hy-label">Explore smart hybrid routing</span><span class="hy-arrow">→</span>
+    </button>
+    <p class="hybrid-note" id="hybridNote" style="display:none;">Hybrid routing keeps easy queries on the local GPU and sends only the hardest math to Swedish cloud, so you keep cloud-level accuracy at a fraction of the carbon.</p>
   </aside>
 
 </section>
@@ -736,7 +756,7 @@ function hideTT() { tt.style.opacity = "0"; }
 
 function ciColor(ci) {
   if (ci === null || ci === undefined) return "#E5E5EA";
-  const stops = [[25,[52,199,89]],[130,[140,224,113]],[260,[255,204,0]],[400,[255,149,0]],[610,[255,59,48]]];
+  const stops = [[25,[0,200,120]],[130,[140,214,0]],[260,[255,214,10]],[400,[255,140,0]],[610,[230,30,60]]];
   const t = Math.max(25, Math.min(610, ci));
   for (let i = 0; i < stops.length - 1; i++) {
     const [x0, c0] = stops[i], [x1, c1] = stops[i+1];
@@ -745,7 +765,7 @@ function ciColor(ci) {
       return `rgb(${Math.round(c0[0]+f*(c1[0]-c0[0]))},${Math.round(c0[1]+f*(c1[1]-c0[1]))},${Math.round(c0[2]+f*(c1[2]-c0[2]))})`;
     }
   }
-  return "rgb(255,59,48)";
+  return "rgb(230,30,60)";
 }
 function projLonLat(lon, lat) {
   return [(lon + 11.5) / 43.0 * 920.0, (71.5 - lat) / 36.5 * 620.0];
@@ -800,12 +820,21 @@ function activateAppleMaps(token) {
       mkMap = new window.mapkit.Map(box, {
         center: new window.mapkit.Coordinate(53.2, 16.0),
         region: new window.mapkit.CoordinateRegion(new window.mapkit.Coordinate(53.2, 16.0), new window.mapkit.CoordinateSpan(26, 38)),
-        mapType: window.mapkit.Map.MapTypes.Standard,
+        mapType: window.mapkit.Map.MapTypes.MutedStandard,
         showsCompass: window.mapkit.FeatureVisibility.Hidden,
         showsMapTypeControl: false,
         showsZoomControl: false,
         isRotationEnabled: false
       });
+
+      // Calm basemap: hide points of interest so the carbon colours are the story
+      try {
+        if (window.mapkit.PointOfInterestFilter && window.mapkit.PointOfInterestFilter.excludingAllCategories) {
+          mkMap.pointOfInterestFilter = window.mapkit.PointOfInterestFilter.excludingAllCategories;
+        } else {
+          mkMap.showsPointsOfInterest = false;
+        }
+      } catch (e) { console.warn("POI filter unavailable", e); }
 
       // Build country PolygonOverlays once from exported rings
       DATA.mapPaths.forEach(mp => {
@@ -815,7 +844,7 @@ function activateAppleMaps(token) {
         mp.rings.forEach(ring => {
           const coords = ring.map(([lo, la]) => new window.mapkit.Coordinate(la, lo));
           const poly = new window.mapkit.PolygonOverlay(coords, {
-            style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.18, strokeColor: "rgba(0, 122, 255, 0.28)", lineWidth: 0.8 }),
+            style: new window.mapkit.Style({ fillColor: "#EAECEF", fillOpacity: 0.55, strokeColor: "rgba(29, 29, 31, 0.5)", lineWidth: 1.2 }),
             data: { iso }
           });
           mkMap.addOverlay(poly);
@@ -884,9 +913,9 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     const isSel = iso === state.cc || (iso === "UK" && state.cc === "GB");
     const style = new window.mapkit.Style({
       fillColor: fill,
-      fillOpacity: iso === "UK" ? 0.14 : (isSel ? 0.28 : 0.18),
-      strokeColor: isSel ? "#007AFF" : "rgba(0, 122, 255, 0.28)",
-      lineWidth: isSel ? 2.4 : 0.8
+      fillOpacity: iso === "UK" ? 0.12 : (isSel ? 0.78 : 0.58),
+      strokeColor: isSel ? "#1D1D1F" : "rgba(29, 29, 31, 0.5)",
+      lineWidth: isSel ? 3 : 1.2
     });
     polys.forEach(p => { p.style = style; });
   });
@@ -904,7 +933,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
         new window.mapkit.Coordinate(d.jlat, d.jlon),
         () => {
           const dot = document.createElement("div");
-          const sz = isSel ? 16 : Math.round(9 + ((d.pue || 1.2) - 1.05) * 18);
+          const sz = isSel ? 15 : Math.round(7 + ((d.pue || 1.2) - 1.05) * 14);
           dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.32);cursor:pointer;`;
           dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
           return dot;
@@ -998,6 +1027,7 @@ let state = {
   expRun: 1,
   zoom: 1, panX: 0, panY: 0,
   useMapKit: false,
+  hybrid: false,
 };
 
 function stopPlay() {
@@ -1046,26 +1076,46 @@ function renderAll() {
   const cloudR1Acc = routineShare * 91.0 + mathShare * 99.0;
 
   const escTotal = Math.round(mathShare * 31);
-  let winner = {
-    tag: "Smart Hybrid Router",
-    title: `Local GPU + ${escTotal}% Sweden Cloud`,
-    co2: routerCo2, acc: routerAcc, wh: routerLocalWh + routerCloudWh, mode: "router", esc: escTotal,
-    why: `Batched local GPU handles routine + confident math; Sweden hydro (${seEffCi.toFixed(0)} g/IT-kWh) handles the hardest 31% of math (${escTotal}% total queries).`
-  };
+  let winner;
 
-  if (state.mixPct <= 15 && state.hwStop >= 2) {
-    const lrWh = 0.0005 * (state.hwStop === 2 ? (0.0480 / 0.0256) : 1.0);
+  if (!state.hybrid) {
+    // SIMPLE DIRECT RESULT: run it locally, or send it to clean Swedish cloud. No routing.
+    const hwName = state.hwStop === 0 ? "a CPU" : state.hwStop === 1 ? "an unbatched GPU" : "a batched GPU";
+    if (localCo2 <= cloudV3SeCo2) {
+      winner = {
+        tag: "Run it locally", title: `Local wins in ${cinfo.name}`,
+        co2: localCo2, acc: localAcc, wh: localWh, mode: "local", esc: 0,
+        why: `On ${hwName}, running locally on ${cinfo.name}'s grid (${effCi.toFixed(0)} g/IT-kWh) emits less CO₂ than sending the same work to Swedish cloud.`
+      };
+    } else {
+      winner = {
+        tag: "Send it to Sweden", title: "Swedish hydro cloud wins",
+        co2: cloudV3SeCo2, acc: cloudV3Acc, wh: cloudV3Wh, mode: "cloud", esc: 100,
+        why: `On ${hwName}, ${cinfo.name}'s grid (${effCi.toFixed(0)} g/IT-kWh) is dirtier than Sweden's hydro cloud (${seEffCi.toFixed(0)} g/IT-kWh), so offloading emits less CO₂.`
+      };
+    }
+  } else {
+    // ADVANCED (opt-in): smart hybrid routing
     winner = {
-      tag: "Always Run Local", title: "Local Batched GPU Wins",
-      co2: lrWh * effCi, acc: 80.0, wh: lrWh, mode: "local", esc: 0,
-      why: `Routine tasks need just 0.0005–0.0018 Wh/q locally — saving 17×–115× energy over Cloud V3 and avoiding R1's 9.2× reasoning tax.`
+      tag: "Smart Hybrid Router",
+      title: `Local GPU + ${escTotal}% Sweden Cloud`,
+      co2: routerCo2, acc: routerAcc, wh: routerLocalWh + routerCloudWh, mode: "router", esc: escTotal,
+      why: `Batched local GPU handles routine + confident math; Sweden hydro (${seEffCi.toFixed(0)} g/IT-kWh) handles the hardest 31% of math (${escTotal}% total queries).`
     };
-  } else if (state.hwStop <= 1 && effCi > 180 && (cloudV3SeCo2 < routerCo2 || cloudV3SeCo2 < localCo2)) {
-    winner = {
-      tag: "Offload to Nordic Cloud", title: "Sweden Hydro Cloud Wins",
-      co2: cloudV3SeCo2, acc: cloudV3Acc, wh: cloudV3Wh, mode: "cloud", esc: 100,
-      why: `${state.hwStop === 0 ? "CPU-only" : "Unbatched bs=1"} execution on ${cinfo.name}'s grid (${effCi.toFixed(0)} g/IT-kWh) emits 5×–8× more CO₂ than Sweden cloud (${cloudV3SeCo2.toFixed(1)} g/1k at 99% Acc).`
-    };
+    if (state.mixPct <= 15 && state.hwStop >= 2) {
+      const lrWh = 0.0005 * (state.hwStop === 2 ? (0.0480 / 0.0256) : 1.0);
+      winner = {
+        tag: "Always Run Local", title: "Local Batched GPU Wins",
+        co2: lrWh * effCi, acc: 80.0, wh: lrWh, mode: "local", esc: 0,
+        why: `Routine tasks need just 0.0005–0.0018 Wh/q locally — saving 17×–115× energy over Cloud V3 and avoiding R1's 9.2× reasoning tax.`
+      };
+    } else if (state.hwStop <= 1 && effCi > 180 && (cloudV3SeCo2 < routerCo2 || cloudV3SeCo2 < localCo2)) {
+      winner = {
+        tag: "Offload to Nordic Cloud", title: "Sweden Hydro Cloud Wins",
+        co2: cloudV3SeCo2, acc: cloudV3Acc, wh: cloudV3Wh, mode: "cloud", esc: 100,
+        why: `${state.hwStop === 0 ? "CPU-only" : "Unbatched bs=1"} execution on ${cinfo.name}'s grid (${effCi.toFixed(0)} g/IT-kWh) emits 5×–8× more CO₂ than Sweden cloud (${cloudV3SeCo2.toFixed(1)} g/1k at 99% Acc).`
+      };
+    }
   }
 
   const savedVsLocalV3 = Math.max(0, (cloudV3LocalCo2 - winner.co2) / cloudV3LocalCo2 * 100.0);
@@ -1090,17 +1140,26 @@ function renderAll() {
     <div class="hero-metrics">
       <div><div class="hm-val">${winner.co2.toFixed(1)} g</div><div class="hm-lbl">CO₂ / 1k queries</div></div>
       <div><div class="hm-val">${winner.acc.toFixed(0)}%</div><div class="hm-lbl">Accuracy</div></div>
-      <div><div class="hm-val" style="color:${winner.mode==="cloud" ? "#64D2FF" : "var(--mint)"}">−${savedVsLocalV3.toFixed(1)}%</div><div class="hm-lbl">vs Local Cloud</div></div>
+      <div><div class="hm-val" style="color:${winner.mode==="cloud" ? "#64D2FF" : "var(--mint)"}">−${savedVsLocalV3.toFixed(1)}%</div><div class="hm-lbl">vs cloud in ${state.cc}</div></div>
     </div>
     <p class="verdict-why">${winner.why}</p>
   `;
 
-  const bars = [
+  const localBar = { label: state.hwStop === 0 ? "Run locally (CPU)" : "Run locally (GPU)", co2: localCo2, acc: localAcc, col: state.hwStop >= 2 ? "#34C759" : "#FF9500" };
+  const seBar = { label: "Cloud in Sweden", co2: cloudV3SeCo2, acc: cloudV3Acc, col: "#007AFF" };
+  const bars = state.hybrid ? [
     { label: "Smart Hybrid Router (→ SE)", co2: routerCo2, acc: routerAcc, col: "#248A3D" },
-    { label: state.hwStop === 0 ? "100% Local (CPU)" : "100% Local (Ministral L4)", co2: localCo2, acc: localAcc, col: state.hwStop >= 2 ? "#34C759" : "#FF9500" },
-    { label: "Sweden Cloud (DeepSeek-V3)", co2: cloudV3SeCo2, acc: cloudV3Acc, col: "#007AFF" },
-    { label: `Reasoning Cloud R1 (${state.cc})`, co2: cloudR1Co2, acc: cloudR1Acc, col: "#FF9500" },
+    localBar, seBar,
+    { label: `Reasoning Cloud R1 (${state.cc})`, co2: cloudR1Co2, acc: cloudR1Acc, col: "#FF3B30" },
+  ] : [
+    localBar, seBar,
+    { label: `Cloud in ${state.cc}`, co2: cloudV3LocalCo2, acc: cloudV3Acc, col: "#FF3B30" },
   ];
+  const hyBtn = document.getElementById("hybridToggle");
+  hyBtn.classList.toggle("on", state.hybrid);
+  hyBtn.setAttribute("aria-pressed", state.hybrid ? "true" : "false");
+  hyBtn.querySelector(".hy-label").textContent = state.hybrid ? "Smart hybrid routing is on" : "Explore smart hybrid routing";
+  document.getElementById("hybridNote").style.display = state.hybrid ? "block" : "none";
   const maxB = Math.max(...bars.map(b => b.co2), 1);
   document.getElementById("waterTag").textContent = `Water: ${(winner.wh * 1.80).toFixed(2)} L/1k`;
   document.getElementById("fourBars").innerHTML = bars.map(b => `
@@ -1236,6 +1295,7 @@ document.getElementById("zoomResetBtn").addEventListener("click", () => {
 });
 
 // Top Map & Hero Sliders
+document.getElementById("hybridToggle").addEventListener("click", () => { state.hybrid = !state.hybrid; renderAll(); });
 document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(x => x.classList.remove("active"));
   b.classList.add("active"); state.cat = b.dataset.cat; renderAll();
