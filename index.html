@@ -1079,8 +1079,8 @@ document.querySelectorAll("#mkStyleBar [data-mktype]").forEach(btn => btn.addEve
 }));
 
 // Top Map & Hero Sliders
-document.querySelectorAll("#pinFilter .pill-btn").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll("#pinFilter .pill-btn").forEach(x => x.classList.remove("active"));
+document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(x => x.classList.remove("active"));
   b.classList.add("active"); state.cat = b.dataset.cat; renderAll();
 }));
 document.getElementById("meanTimeBtn").addEventListener("click", () => { stopPlay(); state.hour = -1; renderAll(); });
