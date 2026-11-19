@@ -1153,7 +1153,7 @@ function renderAll() {
     { label: `Reasoning Cloud R1 (${state.cc})`, co2: cloudR1Co2, acc: cloudR1Acc, col: "#FF3B30" },
   ] : [
     localBar, seBar,
-    { label: `Cloud in ${state.cc}`, co2: cloudV3LocalCo2, acc: cloudV3Acc, col: "#FF3B30" },
+    ...(state.cc === "SE" ? [] : [{ label: `Cloud in ${state.cc}`, co2: cloudV3LocalCo2, acc: cloudV3Acc, col: "#FF3B30" }]),
   ];
   const hyBtn = document.getElementById("hybridToggle");
   hyBtn.classList.toggle("on", state.hybrid);
