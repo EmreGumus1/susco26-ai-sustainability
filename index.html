@@ -85,12 +85,40 @@
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none;
   }
   .glass-pill-bar {
-    pointer-events: auto; background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px);
-    border: 1px solid rgba(255, 255, 255, 0.80); border-radius: 999px;
+    pointer-events: auto; background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: saturate(190%) blur(24px); -webkit-backdrop-filter: saturate(190%) blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.72); border-radius: 999px;
     padding: 4px 6px; display: inline-flex; align-items: center; gap: 4px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.88);
   }
+  .dc-filter-wrap { pointer-events: auto; position: relative; }
+  .dc-filter-trigger {
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.56);
+    backdrop-filter: saturate(190%) blur(22px); -webkit-backdrop-filter: saturate(190%) blur(22px);
+    color: #3A3A3C; font-family: var(--font-sans); font-size: 11.5px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.85);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .dc-filter-trigger:hover { background: rgba(255, 255, 255, 0.80); color: var(--ink); }
+  .dc-filter-menu {
+    position: absolute; top: calc(100% + 6px); left: 0; min-width: 146px; z-index: 30;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: saturate(200%) blur(26px); -webkit-backdrop-filter: saturate(200%) blur(26px);
+    border: 1px solid rgba(255, 255, 255, 0.90); border-radius: 14px; padding: 5px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+    display: none; flex-direction: column; gap: 2px;
+  }
+  .dc-filter-wrap.open .dc-filter-menu { display: flex; }
+  .dc-opt {
+    border: none; background: transparent; color: #3A3A3C; text-align: left;
+    font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+    padding: 7px 10px; border-radius: 9px; cursor: pointer; transition: background 0.12s;
+  }
+  .dc-opt:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+  .dc-opt.active { background: rgba(0, 122, 255, 0.12); color: var(--blue); font-weight: 700; }
   .pill-btn {
     border: none; background: transparent; color: #3A3A3C; font-family: var(--font-sans);
     font-size: 11.8px; font-weight: 600; padding: 5px 10px; border-radius: 999px; cursor: pointer;
@@ -339,8 +367,16 @@
     font-size: 16.5px; font-weight: 800; color: #1D1D1F; letter-spacing: -0.02em;
     margin-bottom: 18px;
   }
+  .team-name-row { display: flex; align-items: center; gap: 8px; }
   .team-name { font-size: 19px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1.25; }
-  .team-role { margin-top: 4px; font-size: 13px; color: var(--gray); line-height: 1.45; }
+  .li-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 5px; color: #0A66C2; opacity: 0.88;
+    transition: transform 0.14s ease, opacity 0.14s ease; flex-shrink: 0;
+  }
+  .li-link:hover { opacity: 1; transform: translateY(-1px); text-decoration: none; }
+  .li-link svg { width: 18px; height: 18px; display: block; }
+  .team-role { margin-top: 5px; font-size: 13px; color: var(--gray); line-height: 1.45; }
 
   /* DARK COLAB & QR CTA BANNER AT BOTTOM */
   .colab-banner {
@@ -471,11 +507,18 @@
     <div id="mapkitContainer"></div>
 
     <div class="map-top-bar">
-      <div class="glass-pill-bar" id="pinFilter">
-        <button class="pill-btn active" data-cat="all">All 91 DCs</button>
-        <button class="pill-btn" data-cat="hyperscaler">Hyperscaler</button>
-        <button class="pill-btn" data-cat="european cloud">EU Cloud</button>
-        <button class="pill-btn" data-cat="colocation">Colo</button>
+      <div class="dc-filter-wrap" id="pinFilter">
+        <button type="button" class="dc-filter-trigger" id="dcFilterBtn" aria-expanded="false" aria-haspopup="listbox">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);opacity:0.85;"></span>
+          <span id="dcFilterLabel">91 DCs</span>
+          <span style="font-size:10px;opacity:0.65;">▾</span>
+        </button>
+        <div class="dc-filter-menu" role="listbox" aria-label="Filter datacenters">
+          <button type="button" class="dc-opt active" data-cat="all" data-lbl="91 DCs">All 91 DCs</button>
+          <button type="button" class="dc-opt" data-cat="hyperscaler" data-lbl="Hyperscaler">Hyperscaler</button>
+          <button type="button" class="dc-opt" data-cat="european cloud" data-lbl="EU Cloud">EU Cloud</button>
+          <button type="button" class="dc-opt" data-cat="colocation" data-lbl="Colocation">Colocation</button>
+        </div>
       </div>
 
       <div class="glass-pill-bar" style="gap:8px;padding:4px 10px;">
@@ -823,18 +866,27 @@
   <section id="team-section" class="team-grid" aria-label="Project team">
     <div class="team-card">
       <div class="team-avatar" style="background:#30D158;">İE</div>
-      <div class="team-name">İ. Emre Gümüş</div>
-      <div class="team-role">Technische Universität Berlin<br/>Information Systems Engineering</div>
+      <div class="team-name-row">
+        <div class="team-name">İ. Emre Gümüş</div>
+        <a class="li-link" href="https://www.linkedin.com/in/emre-gumus/" target="_blank" rel="noopener" aria-label="İ. Emre Gümüş on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg></a>
+      </div>
+      <div class="team-role">Politecnico di Milano<br/>MSc in AI</div>
     </div>
     <div class="team-card">
       <div class="team-avatar" style="background:#7AB8FF;">WO</div>
-      <div class="team-name">Wibke Oesterhaus</div>
-      <div class="team-role">Project team</div>
+      <div class="team-name-row">
+        <div class="team-name">Wibke Oesterhaus</div>
+        <a class="li-link" href="https://www.linkedin.com/in/wibke-oesterhaus-58248016a/" target="_blank" rel="noopener" aria-label="Wibke Oesterhaus on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg></a>
+      </div>
+      <div class="team-role">Technische Universität Berlin<br/>Computer Science</div>
     </div>
     <div class="team-card">
       <div class="team-avatar" style="background:#FFB076;">TF</div>
-      <div class="team-name">Thomas Fox</div>
-      <div class="team-role">Project team</div>
+      <div class="team-name-row">
+        <div class="team-name">Thomas Fox</div>
+        <a class="li-link" href="https://www.linkedin.com/in/thomas-arth-fox/" target="_blank" rel="noopener" aria-label="Thomas Fox on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg></a>
+      </div>
+      <div class="team-role">Technische Universität Berlin<br/>Industrial Engineering</div>
     </div>
   </section>
 
@@ -856,7 +908,7 @@
   </section>
 
   <footer>
-    <span>SusCo26 · 1st Workshop on Sustainable Computing · Technische Universität Berlin · <strong>Emre Gümüş</strong></span>
+    <span>SusCo26 · 1st Workshop on Sustainable Computing · Politecnico di Milano &amp; TU Berlin</span>
     <span style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
       <span><a href="./datacenters.csv" download>91-DC CSV</a> · <a href="./exp_i_multirun_raw.csv" download>L4 K=5 CSV</a> · <a href="./runs_local.csv" download>i7 CPU CSV</a> · <a href="./runs_api.csv" download>Mistral API CSV</a> · <a href="./exp_h_europe_2025_country_datacenter_summary.csv" download>2025 EU Grid CSV</a></span>
       <button type="button" class="stats-foot-btn" id="openStatsBtn" title="Open live visitor & interaction counts (?stats=1)"><span class="stats-dot"></span><span id="liveStatsFooter">Live Stats</span></button>
@@ -1456,9 +1508,29 @@ document.getElementById("zoomResetBtn").addEventListener("click", () => {
 
 // Top Map & Hero Sliders
 document.getElementById("hybridToggle").addEventListener("click", () => { state.hybrid = !state.hybrid; renderAll(); });
-document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(x => x.classList.remove("active"));
-  b.classList.add("active"); state.cat = b.dataset.cat; renderAll();
+const pinFilterWrap = document.getElementById("pinFilter");
+const dcFilterBtn = document.getElementById("dcFilterBtn");
+if (dcFilterBtn && pinFilterWrap) {
+  dcFilterBtn.addEventListener("click", ev => {
+    ev.stopPropagation();
+    const open = pinFilterWrap.classList.toggle("open");
+    dcFilterBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("click", ev => {
+    if (!pinFilterWrap.contains(ev.target)) {
+      pinFilterWrap.classList.remove("open");
+      dcFilterBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+document.querySelectorAll("#pinFilter .dc-opt[data-cat]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#pinFilter .dc-opt[data-cat]").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  state.cat = b.dataset.cat;
+  document.getElementById("dcFilterLabel").textContent = b.dataset.lbl || b.textContent;
+  pinFilterWrap.classList.remove("open");
+  dcFilterBtn.setAttribute("aria-expanded", "false");
+  renderAll();
 }));
 document.getElementById("meanTimeBtn").addEventListener("click", () => { stopPlay(); state.hour = -1; renderAll(); });
 document.getElementById("mapHourSlider").addEventListener("input", e => { stopPlay(); state.hour = +e.target.value; renderAll(); });
