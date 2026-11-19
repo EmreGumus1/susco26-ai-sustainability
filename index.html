@@ -255,23 +255,8 @@
   .dl-title { font-size: 15px; font-weight: 700; }
   .dl-meta { font-size: 12px; color: var(--gray); }
 
-  /* Apple MapKit JS Overrides & Token Modal */
+  /* Apple MapKit JS bottom clearance */
   body.mk-active .map-bottom-bar { bottom: 38px; }
-  .mk-style-bar { display: none; gap: 3px; }
-  body.mk-active .mk-style-bar { display: inline-flex; }
-  .mk-modal-backdrop {
-    position: fixed; inset: 0; z-index: 500; background: rgba(29,29,31,0.42);
-    backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 16px;
-  }
-  .mk-modal-backdrop.open { display: flex; }
-  .mk-modal {
-    background: #FFFFFF; border: 1px solid var(--border); border-radius: 20px; max-width: 500px; width: 100%;
-    padding: 22px 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.22);
-  }
-  .mk-modal textarea {
-    width: 100%; height: 76px; margin: 10px 0; padding: 10px; border-radius: 10px;
-    border: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; resize: vertical;
-  }
 
   .tooltip {
     position: fixed; pointer-events: none; z-index: 999; background: rgba(29, 29, 31, 0.94); color: #FFF;
@@ -418,14 +403,6 @@
         <button class="pill-btn" data-cat="hyperscaler">Hyperscaler</button>
         <button class="pill-btn" data-cat="european cloud">EU Cloud</button>
         <button class="pill-btn" data-cat="colocation">Colo</button>
-        <span style="width:1px;height:16px;background:rgba(0,0,0,0.14);margin:0 2px;"></span>
-        <button class="pill-btn" id="appleMapsToggle" title="Switch to Live Apple Maps (MapKit JS)"> Apple Maps</button>
-      </div>
-
-      <div class="glass-pill-bar mk-style-bar" id="mkStyleBar">
-        <button class="pill-btn active" data-mktype="standard">Standard</button>
-        <button class="pill-btn" data-mktype="muted">Muted</button>
-        <button class="pill-btn" data-mktype="hybrid">Satellite</button>
       </div>
 
       <div class="glass-pill-bar" style="gap:8px;padding:4px 10px;">
@@ -444,22 +421,6 @@
 
     <div class="map-svg-wrap" id="mapSvgWrap">
       <svg id="europeSvg" viewBox="0 0 920 620" preserveAspectRatio="xMidYMid meet" aria-label="Interactive European Carbon & Datacenter Map"></svg>
-    </div>
-
-    <div class="mk-modal-backdrop" id="mkModal">
-      <div class="mk-modal">
-        <div class="kicker">Live Apple Maps (MapKit JS)</div>
-        <h3 style="margin:4px 0 6px;font-size:20px;font-weight:800;">Connect Your Apple Developer MapKit Key</h3>
-        <p style="margin:0;font-size:13px;color:var(--gray);line-height:1.45;">
-          Apple Developer Team ID: <code style="color:var(--ink);font-weight:700;">9KFU5JY2SA</code>.<br/>
-          Paste a signed MapKit JS JWT below to activate live Apple Maps tiles with all 91 datacenters, 2025 hourly country polygons, and Sweden escalation arcs:
-        </p>
-        <textarea id="mkTokenInput" placeholder="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ii4uLiJ9..."></textarea>
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
-          <button class="pill-btn" id="mkCancelBtn" style="border:1px solid var(--border);padding:7px 14px;">Keep Vector Map</button>
-          <button class="pill-btn active" id="mkSaveBtn" style="padding:7px 16px;">Save &amp; Enable  Apple Maps</button>
-        </div>
-      </div>
     </div>
 
     <div class="map-bottom-bar">
@@ -816,7 +777,6 @@ function activateAppleMaps(token) {
     document.body.classList.add("mk-active");
     document.getElementById("mapkitContainer").style.display = "block";
     document.getElementById("mapSvgWrap").style.display = "none";
-    document.getElementById("appleMapsToggle").classList.add("active");
     renderAll();
     return;
   }
@@ -835,7 +795,6 @@ function activateAppleMaps(token) {
       box.style.display = "block";
       document.getElementById("mapSvgWrap").style.display = "none";
       document.body.classList.add("mk-active");
-      document.getElementById("appleMapsToggle").classList.add("active");
       state.useMapKit = true;
 
       mkMap = new window.mapkit.Map(box, {
@@ -910,7 +869,6 @@ function disableAppleMaps() {
   document.body.classList.remove("mk-active");
   document.getElementById("mapkitContainer").style.display = "none";
   document.getElementById("mapSvgWrap").style.display = "flex";
-  document.getElementById("appleMapsToggle").classList.remove("active");
   renderAll();
 }
 
@@ -961,7 +919,7 @@ function syncMapKitLayer(localLon, localLat, escPct) {
   // 2b. Frosted Liquid Glass Country g/kWh pill annotations
   if (mkCountryLabels.length) mkMap.removeAnnotations(mkCountryLabels);
   mkCountryLabels = [];
-  [["SE",16.5,64.2],["NO",8.2,62.0],["FI",25.6,63.2],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
+  [["SE",15.8,61.5],["NO",8.2,61.5],["FI",25.5,61.8],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
     const c = DATA.countries[iso];
     if (!c) return;
     const ci = (hour >= 0 && c.diurnal) ? c.diurnal[hour] : c.ciMean;
@@ -1276,35 +1234,6 @@ document.getElementById("zoomResetBtn").addEventListener("click", () => {
     state.zoom = 1; state.panX = 0; state.panY = 0; renderAll();
   }
 });
-
-// Apple Maps Toggle, Map Type Switcher & Inline JWT Modal
-document.getElementById("appleMapsToggle").addEventListener("click", () => {
-  if (state.useMapKit) { disableAppleMaps(); return; }
-  const t = getActiveMapKitToken();
-  if (t) { activateAppleMaps(t); }
-  else {
-    document.getElementById("mkTokenInput").value = "";
-    document.getElementById("mkModal").classList.add("open");
-  }
-});
-document.getElementById("mkCancelBtn").addEventListener("click", () => {
-  document.getElementById("mkModal").classList.remove("open");
-});
-document.getElementById("mkSaveBtn").addEventListener("click", () => {
-  const val = document.getElementById("mkTokenInput").value.trim();
-  if (!val) return;
-  localStorage.setItem("susco26_mapkit_token", val);
-  document.getElementById("mkModal").classList.remove("open");
-  activateAppleMaps(val);
-});
-document.querySelectorAll("#mkStyleBar [data-mktype]").forEach(btn => btn.addEventListener("click", () => {
-  document.querySelectorAll("#mkStyleBar [data-mktype]").forEach(x => x.classList.remove("active"));
-  btn.classList.add("active");
-  if (mkMap && window.mapkit) {
-    const m = btn.dataset.mktype;
-    mkMap.mapType = m === "standard" ? window.mapkit.Map.MapTypes.Standard : m === "hybrid" ? window.mapkit.Map.MapTypes.Hybrid : window.mapkit.Map.MapTypes.MutedStandard;
-  }
-}));
 
 // Top Map & Hero Sliders
 document.querySelectorAll("#pinFilter .pill-btn[data-cat]").forEach(b => b.addEventListener("click", () => {
