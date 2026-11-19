@@ -1064,7 +1064,7 @@ function drawModelCard() {
 }
 
 function renderModelTable() {
-  let rows = DATA.models.filter(m => state.modelFilter === "all" || m.cat === state.modelFilter)
+  let rows = DATA.models.filter(m => state.modelFilter === "all" ? true : state.modelFilter === "Cloud" ? (m.cat === "Cloud" || m.cat === "Overhead") : m.cat === state.modelFilter)
     .map(m => ({ ...m, deCo2: m.gsmWh ? m.gsmWh * 450.7 : -1, seCo2: m.gsmWh ? m.gsmWh * 30.5 : -1 }))
     .sort((a, b) => {
       const va = a[state.sortKey] ?? -1, vb = b[state.sortKey] ?? -1;
