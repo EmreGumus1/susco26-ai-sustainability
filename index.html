@@ -983,7 +983,7 @@ function drawPareto() {
   if (paretoPts.length > 1) out += `<polyline points="${paretoPts.join(" ")}" fill="none" stroke="#008040" stroke-width="2.2" stroke-dasharray="6,4" opacity="0.65"/>`;
 
   const og = {"ministral-l4": [22, -26, "start"], "qwen-0.5b": [0, -14, "middle"], "qwen-1.5b": [0, -14, "middle"], "qwen-3b": [-14, 4, "end"], "gemma-4b": [0, -14, "middle"], "qwen-7b": [-14, 4, "end"], "lfm2-8b": [0, -14, "middle"], "qwen-14b": [14, 18, "start"], "ministral-cpu": [-22, -26, "end"], "deepseek-v3": [0, -14, "middle"], "deepseek-r1": [0, -14, "middle"], "gemini-flash": [14, 18, "start"], "gemini-pro": [-14, 4, "end"]};
-  const oa = {"ministral-l4": [0, -14, "middle"], "qwen-0.5b": [14, 4, "start"], "qwen-1.5b": [0, -14, "middle"], "qwen-3b": [14, 4, "start"], "gemma-4b": [0, -14, "middle"], "qwen-7b": [-14, 34, "end"], "lfm2-8b": [22, -26, "start"], "qwen-14b": [14, 4, "start"], "deepseek-v3": [14, 4, "start"], "deepseek-r1": [-14, -14, "end"], "gemini-flash": [0, -14, "middle"]};
+  const oa = {"gemma-4b": [-14, 4, "end"], "lfm2-8b": [16, 16, "start"], "qwen-7b": [-6, -21, "middle"], "qwen-14b": [14, 0, "start"], "qwen-1.5b": [8, 31, "start"], "deepseek-v3": [14, 0, "start"], "qwen-3b": [27, 47, "start"], "deepseek-r1": [-19, -11, "end"], "gemini-flash": [-12, 7, "end"], "ministral-l4": [14, 0, "start"], "qwen-0.5b": [14, 0, "start"]};
 
   items.forEach(m => {
     const wh = isGsm ? m.gsmWh : m.agWh, acc = isGsm ? m.gsmAcc : m.agAcc, px = sx(wh), py = sy(acc);
