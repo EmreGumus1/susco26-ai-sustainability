@@ -79,35 +79,35 @@
   }
   .nav-btn:hover { background: #333336; text-decoration: none; }
 
-  .container { max-width: 1360px; margin: 0 auto; padding: 20px 22px 64px; }
+  .container { max-width: 1360px; margin: 0 auto; padding: 14px 22px 56px; }
 
   /* Clean Apple Hero Header */
   .hero-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-end;
-    gap: 12px 24px;
+    gap: 10px 24px;
   }
   .kicker {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--blue);
   }
   h1 {
-    font-size: clamp(28px, 3.6vw, 44px);
+    font-size: clamp(26px, 3.1vw, 38px);
     line-height: 1.06;
     font-weight: 800;
     letter-spacing: -0.03em;
-    margin: 4px 0 6px;
+    margin: 3px 0 4px;
   }
   .subtitle {
     margin: 0;
     color: var(--gray);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 400;
   }
 
@@ -115,7 +115,7 @@
   .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.65fr) minmax(320px, 410px);
-    gap: 18px;
+    gap: 16px;
     align-items: stretch;
   }
 
@@ -125,7 +125,7 @@
     border-radius: 22px;
     position: relative;
     overflow: hidden;
-    min-height: 580px;
+    min-height: 525px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.045);
     display: flex;
     flex-direction: column;
@@ -187,7 +187,7 @@
   .map-svg-wrap svg {
     width: 100%;
     height: 100%;
-    min-height: 580px;
+    min-height: 525px;
     display: block;
     overflow: hidden;
   }
@@ -238,11 +238,11 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 22px;
-    padding: 20px;
+    padding: 16px 18px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.045);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 11px;
   }
 
   .ctrl-label {
@@ -290,7 +290,7 @@
     background: var(--ink);
     color: #FFFFFF;
     border-radius: 16px;
-    padding: 18px 18px 16px;
+    padding: 14px 16px;
   }
   .verdict-tag {
     display: inline-block;
@@ -305,8 +305,8 @@
   }
   .verdict-card.cloud-mode .verdict-tag { background: #64D2FF; }
   .verdict-title {
-    margin: 8px 0 12px;
-    font-size: 20px;
+    margin: 6px 0 8px;
+    font-size: 18.5px;
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -315,16 +315,16 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    padding: 10px 0;
+    padding: 8px 0;
     border-top: 1px solid rgba(255,255,255,0.12);
     border-bottom: 1px solid rgba(255,255,255,0.12);
   }
-  .hm-val { font-size: 18px; font-weight: 800; font-family: var(--font-mono); color: #FFFFFF; }
-  .hm-lbl { font-size: 11px; color: #AEAEB2; margin-top: 1px; }
-  .verdict-why { margin: 10px 0 0; font-size: 13px; color: #E5E5EA; line-height: 1.42; }
+  .hm-val { font-size: 17px; font-weight: 800; font-family: var(--font-mono); color: #FFFFFF; }
+  .hm-lbl { font-size: 10.8px; color: #AEAEB2; margin-top: 1px; }
+  .verdict-why { margin: 8px 0 0; font-size: 12.5px; color: #E5E5EA; line-height: 1.38; }
 
   /* Only 4 Clean Comparison Bars */
-  .bars-wrap { display: flex; flex-direction: column; gap: 9px; }
+  .bars-wrap { display: flex; flex-direction: column; gap: 6px; }
   .bar-row { display: flex; flex-direction: column; gap: 4px; }
   .bar-top { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; }
   .bar-track { height: 9px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--border-soft); }
@@ -664,8 +664,9 @@ function renderAll() {
   const cloudR1Acc = routineShare * 91.0 + mathShare * 99.0;
 
   // Determine clean headline answer
-  let winner = { tag: "Smart Hybrid Router", title: "Local GPU + 31% Sweden Cloud", co2: routerCo2, acc: routerAcc, wh: routerLocalWh + routerCloudWh, mode: "router", esc: Math.round(mathShare * 31),
-    why: `Batched local GPU handles routine + confident math; Sweden hydro (${seEffCi.toFixed(0)} g/IT-kWh) handles the hardest 31% without accuracy loss.` };
+  const escTotal = Math.round(mathShare * 31);
+  let winner = { tag: "Smart Hybrid Router", title: `Local GPU + ${escTotal}% Sweden Cloud`, co2: routerCo2, acc: routerAcc, wh: routerLocalWh + routerCloudWh, mode: "router", esc: escTotal,
+    why: `Batched local GPU handles routine + confident math; Sweden hydro (${seEffCi.toFixed(0)} g/IT-kWh) handles the hardest 31% of math (${escTotal}% total queries) at high accuracy.` };
 
   if (state.taskMode === "routine" && state.hw === "bs8") {
     const localRoutineWh = 0.0005; // Qwen2.5-1.5B (80% AG)
@@ -742,23 +743,23 @@ function renderMap(localLon, localLat, escPct) {
     html += `<path class="eu-country" data-iso="${mp.iso}" d="${mp.d}" fill="${fill}" fill-opacity="0.92" stroke="${isSel ? "#1D1D1F" : "#7A7A80"}" stroke-width="${isSel ? "2.2" : "0.9"}" style="cursor:pointer;"/>`;
   });
 
-  [["SE",16.5,63.2],["NO",8.2,62.0],["FI",25.6,63.2],["FR",2.3,46.5],["DE",10.4,51.3],["PL",19.3,52.1],["ES",-3.8,40.2],["IE",-8.1,53.3],["IT",12.5,43.0],["NL",5.4,52.4],["CH",8.2,46.8]].forEach(([iso, lo, la]) => {
-    const c = DATA.countries[iso];
-    const ci = (hour >= 0 && c.diurnal) ? c.diurnal[hour] : c.ciMean;
-    const [x, y] = projLonLat(lo, la);
-    const dark = ci < 45 || ci > 420;
-    html += `<g pointer-events="none">
-      <rect x="${x-29}" y="${y-10}" width="58" height="20" rx="6" fill="${dark ? "#1D1D1F" : "#FFFFFF"}" opacity="${dark ? "0.72" : "0.86"}"/>
-      <text x="${x}" y="${y+4}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${dark ? "#FFFFFF" : "#1D1D1F"}">${iso} ${Math.round(ci)}g</text>
-    </g>`;
-  });
-
   DATA.dcs.filter(d => state.cat === "all" || d.category === state.cat).forEach(d => {
     const [x, y] = projLonLat(d.jlon, d.jlat);
     const isSel = d.id === state.dcId;
     const col = d.category === "hyperscaler" ? "#0071E3" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
     const rad = isSel ? 8 : (4.3 + ((d.pue || 1.2) - 1.05) * 9.5);
     html += `<circle class="dc-pin" data-dcid="${d.id}" cx="${x}" cy="${y}" r="${rad.toFixed(1)}" fill="${isSel ? "#008040" : col}" stroke="#FFFFFF" stroke-width="${isSel ? "2.4" : "1.2"}" opacity="0.95" style="cursor:pointer;"/>`;
+  });
+
+  [["SE",16.5,64.2],["NO",8.2,62.0],["FI",25.6,63.2],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,38.8],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
+    const c = DATA.countries[iso];
+    const ci = (hour >= 0 && c.diurnal) ? c.diurnal[hour] : c.ciMean;
+    const [x, y] = projLonLat(lo, la);
+    const dark = ci < 45 || ci > 420;
+    html += `<g pointer-events="none">
+      <rect x="${x-29}" y="${y-10}" width="58" height="20" rx="6" fill="${dark ? "#1D1D1F" : "#FFFFFF"}" opacity="${dark ? "0.78" : "0.90"}"/>
+      <text x="${x}" y="${y+4}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${dark ? "#FFFFFF" : "#1D1D1F"}">${iso} ${Math.round(ci)}g</text>
+    </g>`;
   });
 
   const [lx, ly] = projLonLat(localLon, localLat);
@@ -771,7 +772,7 @@ function renderMap(localLon, localLat, escPct) {
     html += `<path d="M ${lx} ${ly} Q ${mx} ${my} ${sx} ${sy}" fill="none" stroke="#FFFFFF" stroke-width="5.5" opacity="0.72"/>`;
     html += `<path class="route-arc" d="M ${lx} ${ly} Q ${mx} ${my} ${sx} ${sy}" fill="none" stroke="${escPct === 100 ? "#E35D00" : "#0071E3"}" stroke-width="3.2" stroke-linecap="round"/>`;
     html += `<g pointer-events="none">
-      <rect x="${mx-64}" y="${my-13}" width="128" height="23" rx="11.5" fill="#1D1D1F" opacity="0.92"/>
+      <rect x="${mx-72}" y="${my-13}" width="144" height="23" rx="11.5" fill="#1D1D1F" opacity="0.92"/>
       <text x="${mx}" y="${my+2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#30D158">${escPct}% Cloud → Sweden</text>
     </g>`;
     html += `<circle cx="${sx}" cy="${sy}" r="9.5" fill="#0071E3" stroke="#FFFFFF" stroke-width="2.4"/>`;
@@ -982,7 +983,7 @@ function drawPareto() {
   if (paretoPts.length > 1) out += `<polyline points="${paretoPts.join(" ")}" fill="none" stroke="#008040" stroke-width="2.2" stroke-dasharray="6,4" opacity="0.65"/>`;
 
   const og = {"qwen-0.5b":[12,4,"start"],"qwen-1.5b":[-12,4,"end"],"qwen-3b":[-12,4,"end"],"gemma-4b":[12,10,"start"],"qwen-7b":[-10,-14,"end"],"ministral-l4":[12,-8,"start"],"lfm2-8b":[0,-16,"middle"],"qwen-14b":[14,6,"start"],"ministral-cpu":[0,-16,"middle"],"gemini-flash":[12,14,"start"],"deepseek-v3":[-12,-13,"end"],"gemini-pro":[-12,16,"end"],"deepseek-r1":[-12,-14,"end"]};
-  const oa = {"qwen-0.5b":[12,4,"start"],"qwen-1.5b":[-12,14,"end"],"qwen-3b":[-12,-10,"end"],"qwen-7b":[14,14,"start"],"gemma-4b":[-12,-16,"end"],"lfm2-8b":[14,-14,"start"],"qwen-14b":[14,6,"start"],"ministral-l4":[12,4,"start"],"gemini-flash":[-12,-12,"end"],"deepseek-v3":[12,14,"start"],"deepseek-r1":[-12,-12,"end"]};
+  const oa = {"qwen-0.5b":[12,4,"start"],"qwen-1.5b":[-12,14,"end"],"qwen-3b":[-12,-10,"end"],"qwen-7b":[14,14,"start"],"gemma-4b":[-12,-16,"end"],"lfm2-8b":[-14,14,"end"],"qwen-14b":[14,6,"start"],"ministral-l4":[12,4,"start"],"gemini-flash":[-12,-12,"end"],"deepseek-v3":[12,14,"start"],"deepseek-r1":[-12,-12,"end"]};
 
   items.forEach(m => {
     const wh = isGsm ? m.gsmWh : m.agWh, acc = isGsm ? m.gsmAcc : m.agAcc, px = sx(wh), py = sy(acc);
