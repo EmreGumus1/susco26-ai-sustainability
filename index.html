@@ -495,7 +495,7 @@
       <a class="nav-link" href="#sliders">Slide &amp; See</a>
       <a class="nav-link" href="#pareto-section">Pareto Frontier</a>
       <a class="nav-link" href="#model-table-section">13-Model Table</a>
-      <a class="nav-btn" href="./SusCo26_Poster_Group_Gumus.pdf" target="_blank" rel="noopener">Poster PDF</a>
+      <a class="nav-btn" href="#data-downloads">Notebooks &amp; CSVs</a>
     </div>
   </div>
 </nav>
@@ -776,10 +776,13 @@
       <div class="sub-panel" id="modelCard"></div>
     </div>
 
-    <div class="dl-grid">
-      <a class="dl-card" href="./SusCo26_Poster_Group_Gumus.pdf" target="_blank" rel="noopener"><div class="dl-kind">PDF · A0 Portrait</div><div class="dl-title">SusCo26 Poster PDF</div><div class="dl-meta">841×1189 mm vector LaTeX poster</div></a>
-      <a class="dl-card" href="./TU_Berlin_AI_Sustainability_Overleaf_Report.pdf" target="_blank" rel="noopener"><div class="dl-kind">PDF · 5-Page Paper</div><div class="dl-title">TU Berlin Technical Report</div><div class="dl-meta">Full Tables 1–6, water &amp; K=5 stats</div></a>
-      <a class="dl-card" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener"><div class="dl-kind">Google Colab</div><div class="dl-title">Open Complete Notebook</div><div class="dl-meta">12-cell L4 + Ollama + DeepSeek logs</div></a>
+    <div id="data-downloads" class="dl-grid" style="scroll-margin-top:76px;">
+      <a class="dl-card" href="./local_benchmark.ipynb" download><div class="dl-kind">Notebook · Local CPU</div><div class="dl-title">local_benchmark.ipynb</div><div class="dl-meta">CodeCarbon + EcoLogits (GSM8K &amp; AG News)</div></a>
+      <a class="dl-card" href="./api_benchmark.ipynb" download><div class="dl-kind">Notebook · Mistral API</div><div class="dl-title">api_benchmark.ipynb</div><div class="dl-meta">Mistral 3B, Large &amp; 4.0 Thinking + EcoLogits</div></a>
+      <a class="dl-card" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener"><div class="dl-kind">Google Colab · L4 GPU</div><div class="dl-title">Open Complete Notebook</div><div class="dl-meta">12-cell L4 + Ollama + DeepSeek logs</div></a>
+      <a class="dl-card" href="./datacenters.csv" download><div class="dl-kind">CSV · 91 EU Datacenters</div><div class="dl-title">datacenters.csv</div><div class="dl-meta">Operator, city, coordinates, PUE &amp; WUE</div></a>
+      <a class="dl-card" href="./exp_h_europe_2025_country_datacenter_summary.csv" download><div class="dl-kind">CSV · 2025 EU Grid CI</div><div class="dl-title">2025 Country Grid Summary</div><div class="dl-meta">17-country carbon intensity &amp; effective IT CI</div></a>
+      <a class="dl-card" href="./exp_i_multirun_raw.csv" download><div class="dl-kind">CSV · L4 K=5 Suite</div><div class="dl-title">exp_i_multirun_raw.csv</div><div class="dl-meta">35-run repeatability &amp; cold-start telemetry</div></a>
     </div>
   </section>
 
@@ -1863,7 +1866,7 @@ const STAT_META = [
   { key: "batching-click", label: "Batching (1/4/8) & Slide Cards", col: "#FF9500" },
   { key: "pareto-table", label: "Pareto, 13-Model & K=5 Controls", col: "#5856D6" },
   { key: "colab-open", label: "Google Colab Open / Copy Link", col: "#30D158" },
-  { key: "poster-download", label: "Poster PDF, Report & CSV Downloads", col: "#1D1D1F" }
+  { key: "poster-download", label: "Notebook & CSV Downloads", col: "#1D1D1F" }
 ];
 const isStatsView = new URLSearchParams(location.search).get("stats") === "1";
 const statTimers = {};
@@ -1955,7 +1958,7 @@ document.addEventListener("click", e => {
   if (t.closest("#statsModal") || t.closest("#openStatsBtn")) return;
   if (t.closest("#hybridToggle")) { trackInteraction("hybrid-toggle"); return; }
   if (t.closest(".colab-open-btn, #copyColabBtn") || t.closest('a[href*="colab.research.google.com"]')) { trackInteraction("colab-open"); return; }
-  if (t.closest(".nav-btn") || t.closest('a[href$=".pdf"], a[download]')) { trackInteraction("poster-download"); return; }
+  if (t.closest('a[href$=".ipynb"], a[download]')) { trackInteraction("poster-download"); return; }
   if (t.closest("#countryPills button, #pinFilter button, #zoomInBtn, #zoomOutBtn, #zoomResetBtn, #europeSvg .eu-country, #europeSvg .dc-pin, #mapkitContainer")) {
     trackInteraction("map-click", 350); return;
   }
