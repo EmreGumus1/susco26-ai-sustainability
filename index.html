@@ -1196,46 +1196,10 @@ function syncMapKitLayer(localLon, localLat, escPct) {
   });
   mkMap.addAnnotations(mkCountryLabels);
 
-  // 3. Draw curved geodesic Bézier PolylineOverlay arc from Local Node to Sweden
+  // 3. Keep map clean without dashed cross-border routing overlays
   if (mkRouteOverlay) { mkMap.removeOverlay(mkRouteOverlay); mkRouteOverlay = null; }
   if (mkRouteBadge) { mkMap.removeAnnotation(mkRouteBadge); mkRouteBadge = null; }
   if (mkTargetBeacon) { mkMap.removeAnnotation(mkTargetBeacon); mkTargetBeacon = null; }
-
-  const se = DATA.countries["SE"];
-  if (escPct > 0 && state.cc !== "SE") {
-    const midLat = (localLat + se.lat) / 2 + 2.2;
-    const midLon = (localLon + se.lon) / 2 - 2.6;
-    const arcCoords = [];
-    for (let i = 0; i <= 24; i++) {
-      const t = i / 24;
-      const lat = (1 - t) * (1 - t) * localLat + 2 * (1 - t) * t * midLat + t * t * se.lat;
-      const lon = (1 - t) * (1 - t) * localLon + 2 * (1 - t) * t * midLon + t * t * se.lon;
-      arcCoords.push(new window.mapkit.Coordinate(lat, lon));
-    }
-    mkRouteOverlay = new window.mapkit.PolylineOverlay(arcCoords, {
-      style: new window.mapkit.Style({
-        lineWidth: 3.5,
-        strokeColor: escPct === 100 ? "#FF9500" : "#007AFF",
-        lineDash: [8, 6]
-      })
-    });
-    mkMap.addOverlay(mkRouteOverlay);
-
-    mkRouteBadge = new window.mapkit.Annotation(new window.mapkit.Coordinate(midLat, midLon), () => {
-      const el = document.createElement("div");
-      el.style.cssText = "background:rgba(28,28,30,0.82);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border:1px solid rgba(255,255,255,0.20);color:#34C759;font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,0.24);pointer-events:none;";
-      el.textContent = `${escPct}% Cloud → Sweden`;
-      return el;
-    });
-    mkMap.addAnnotation(mkRouteBadge);
-
-    mkTargetBeacon = new window.mapkit.Annotation(new window.mapkit.Coordinate(se.lat, se.lon), () => {
-      const el = document.createElement("div");
-      el.style.cssText = "width:16px;height:16px;border-radius:50%;background:#007AFF;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35);";
-      return el;
-    });
-    mkMap.addAnnotation(mkTargetBeacon);
-  }
 }
 
 const berlinDc = DATA.dcs.find(d => d.name.includes("BER01"));
@@ -1445,20 +1409,6 @@ function renderMap(localLon, localLat, escPct) {
   });
 
   const [lx, ly] = projLonLat(localLon, localLat);
-  const se = DATA.countries["SE"];
-  const [sx, sy] = projLonLat(se.lon, se.lat);
-
-  if (escPct > 0 && state.cc !== "SE") {
-    const mx = (lx + sx) / 2 - (sy - ly) * 0.20;
-    const my = (ly + sy) / 2 + (sx - lx) * 0.14 - 32;
-    html += `<path d="M ${lx} ${ly} Q ${mx} ${my} ${sx} ${sy}" fill="none" stroke="#FFFFFF" stroke-width="5.5" opacity="0.72"/>`;
-    html += `<path class="route-arc" d="M ${lx} ${ly} Q ${mx} ${my} ${sx} ${sy}" fill="none" stroke="${escPct === 100 ? "#E35D00" : "#0071E3"}" stroke-width="3.2" stroke-linecap="round"/>`;
-    html += `<g pointer-events="none">
-      <rect x="${mx-72}" y="${my-13}" width="144" height="23" rx="11.5" fill="#1D1D1F" opacity="0.92"/>
-      <text x="${mx}" y="${my+2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#30D158">${escPct}% Cloud → Sweden</text>
-    </g>`;
-    html += `<circle cx="${sx}" cy="${sy}" r="9.5" fill="#0071E3" stroke="#FFFFFF" stroke-width="2.4"/>`;
-  }
 
   html += `<circle class="pulse-circle" cx="${lx}" cy="${ly}" r="10" fill="none" stroke="#008040" stroke-width="2.5"/>`;
   html += `<circle cx="${lx}" cy="${ly}" r="7" fill="#008040" stroke="#FFFFFF" stroke-width="2.2"/>`;
