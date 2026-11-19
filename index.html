@@ -373,20 +373,19 @@
   .stat-tile .lbl { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; }
   .stat-tile .val { font-size: 15.5px; font-weight: 800; font-family: var(--font-mono); margin-top: 2px; }
 
-  details { margin-top: 18px; }
-  summary {
-    cursor: pointer;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--blue);
-    padding: 8px 0;
-    user-select: none;
-  }
-  .table-wrap { margin-top: 10px; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
-  th { background: var(--bg); text-align: left; padding: 10px 12px; border-bottom: 1.5px solid var(--border); font-weight: 700; }
-  td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); }
-  tr:hover td { background: #F5F8FD; }
+  .table-wrap { margin-top: 14px; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
+  th { background: var(--bg); text-align: left; padding: 11px 12px; border-bottom: 1.5px solid var(--border); font-weight: 700; cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { background: #EBEBF0; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+  tbody tr { transition: background 0.12s; cursor: pointer; }
+  tbody tr:hover td { background: #F5F8FD; }
+  tbody tr.selected-row td { background: var(--green-tint); }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .b-local { background: var(--green-tint); color: var(--green); }
+  .b-cloud { background: var(--blue-tint); color: var(--blue); }
+  .b-over { background: var(--orange-tint); color: var(--orange); }
+  .b-cpu { background: #F2F2F7; color: var(--gray); }
 
   .dl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .dl-card {
@@ -561,6 +560,41 @@
     <div id="tabBody"></div>
   </section>
 
+  <!-- ALWAYS-OPEN BOTTOM MASTER 13-MODEL TABLE -->
+  <section id="model-table-section" class="evidence-card" style="margin-top:18px;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px;">
+      <div>
+        <div class="kicker">Master N=100 Comparison · Click Any Row or Header</div>
+        <h2 style="margin:2px 0 0;font-size:21px;font-weight:800;letter-spacing:-0.02em;">All 13 Evaluated Models</h2>
+      </div>
+      <div class="seg-row" style="width:auto;" id="modelFilter">
+        <button class="seg-opt active" data-filter="all" style="padding:6px 12px;">All (13)</button>
+        <button class="seg-opt" data-filter="Local" style="padding:6px 12px;">Local GPU (8)</button>
+        <button class="seg-opt" data-filter="Cloud" style="padding:6px 12px;">Cloud &amp; Jegham Ref (4)</button>
+        <button class="seg-opt" data-filter="Overhead" style="padding:6px 12px;">Reasoning R1</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="modelTable">
+        <thead>
+          <tr>
+            <th data-sort="name">Model</th>
+            <th data-sort="family">Runtime</th>
+            <th data-sort="agAcc">AG Acc</th>
+            <th data-sort="agWh">AG Wh/q</th>
+            <th data-sort="gsmAcc">GSM Acc</th>
+            <th data-sort="gsmWh">GSM Wh/q</th>
+            <th data-sort="gsmTok">GSM Tok</th>
+            <th data-sort="deCo2">DE CO₂/1k GSM</th>
+            <th data-sort="seCo2">SE CO₂/1k GSM</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
   <footer>
     <span><strong>TU Berlin · Emre Gümüş</strong> · SusCo26 (1st Workshop on Sustainable Computing)</span>
     <span>Fraunhofer ISE (2025–26) · CodeCarbon &amp; EcoLogits · Jegham et al. (2025) · EU 91-DC Registry</span>
@@ -615,6 +649,9 @@ let state = {
   bottomTab: "pareto",
   paretoTask: "gsm",
   selectedModelId: "ministral-l4",
+  modelFilter: "all",
+  sortKey: "gsmAcc",
+  sortDir: -1,
   expIdx: 3,
 };
 
@@ -874,20 +911,9 @@ function renderTab() {
         <div class="svg-box"><svg id="paretoSvg" viewBox="0 0 740 400"></svg></div>
         <div class="sub-panel" id="modelCard"></div>
       </div>
-      <details>
-        <summary>Show full 13-model benchmark table ▾</summary>
-        <div class="table-wrap"><table><thead><tr><th>Model</th><th>Runtime</th><th>AG Acc / Wh</th><th>GSM Acc / Wh</th><th>GSM Tok</th><th>DE CO₂/1k GSM</th><th>SE CO₂/1k GSM</th></tr></thead><tbody id="fullModelTbody"></tbody></table></div>
-      </details>
     `;
     drawPareto();
     drawModelCard();
-    document.getElementById("fullModelTbody").innerHTML = DATA.models.map(m => `
-      <tr><td><strong>${m.name}</strong></td><td>${m.runtime}</td>
-      <td class="mono">${m.agAcc !== null ? m.agAcc + "% / " + m.agWh : "—"}</td>
-      <td class="mono"><strong>${m.gsmAcc}%</strong> / ${m.gsmWh}</td>
-      <td class="mono">${m.gsmTok}${m.thinkGsm > 0 ? " <span style='color:var(--orange)'>+" + m.thinkGsm + "</span>" : ""}</td>
-      <td class="mono">${(m.gsmWh*450.7).toFixed(1)} g</td>
-      <td class="mono">${(m.gsmWh*30.5).toFixed(2)} g</td></tr>`).join("");
     body.querySelectorAll("#pTaskToggle .seg-opt").forEach(b => b.addEventListener("click", () => {
       state.paretoTask = b.dataset.pt;
       renderTab();
@@ -1003,7 +1029,7 @@ function drawPareto() {
     const m = DATA.models.find(x => x.id === el.dataset.mid);
     el.addEventListener("mousemove", ev => showTT(ev, `<strong>${m.name}</strong><br/>Acc: <b>${isGsm?m.gsmAcc:m.agAcc}%</b> · Energy: <b>${isGsm?m.gsmWh:m.agWh} Wh/q</b>`));
     el.addEventListener("mouseleave", hideTT);
-    el.addEventListener("click", () => { state.selectedModelId = m.id; drawPareto(); drawModelCard(); });
+    el.addEventListener("click", () => { state.selectedModelId = m.id; drawPareto(); drawModelCard(); renderModelTable(); });
   });
 }
 
@@ -1011,6 +1037,17 @@ function drawModelCard() {
   const m = DATA.models.find(x => x.id === state.selectedModelId) || DATA.models[0];
   const card = document.getElementById("modelCard");
   if (!card) return;
+  const agSplit = m.agWld !== null ? `
+    <div style="margin-top:12px;">
+      <div style="font-size:10.8px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">AG News Breakdown (25 / Category)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;">
+        ${[["World", m.agWld], ["Sports", m.agSpt], ["Business", m.agBus], ["Sci/Tech", m.agSci]].map(([k, v]) => `
+          <div style="background:var(--card);border:1px solid var(--border-soft);border-radius:9px;padding:6px 4px;">
+            <div style="font-size:10.5px;color:var(--gray)">${k}</div>
+            <div style="font-weight:800;font-size:13.5px;color:${v >= 90 ? "var(--green)" : "var(--ink)"}">${v}%</div>
+          </div>`).join("")}
+      </div>
+    </div>` : "";
   card.innerHTML = `
     <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;">${m.family}</div>
     <h3 style="margin:4px 0 2px;font-size:20px;font-weight:800;">${m.name}</h3>
@@ -1021,8 +1058,53 @@ function drawModelCard() {
       <div class="stat-tile"><div class="lbl">AG News</div><div class="val">${m.agAcc!==null?m.agAcc+"% · "+m.agWh+" Wh":"—"}</div></div>
       <div class="stat-tile"><div class="lbl">DE / SE CO₂</div><div class="val">${(m.gsmWh*450.7).toFixed(1)} / ${(m.gsmWh*30.5).toFixed(1)} g</div></div>
       <div class="stat-tile"><div class="lbl">Water / Tok</div><div class="val">${(m.gsmWh*1.8).toFixed(2)} L · ${m.gsmTok}</div></div>
-    </div>`;
+    </div>
+    ${m.thinkGsm > 0 ? `<div style="margin-top:10px;padding:8px 10px;border-radius:9px;background:var(--orange-tint);color:var(--orange);font-size:12px;font-weight:700;">Hidden Thinking Tokens: +${m.thinkAg.toLocaleString()} (AG) · +${m.thinkGsm.toLocaleString()} (GSM8K)</div>` : ""}
+    ${agSplit}`;
 }
+
+function renderModelTable() {
+  let rows = DATA.models.filter(m => state.modelFilter === "all" || m.cat === state.modelFilter)
+    .map(m => ({ ...m, deCo2: m.gsmWh ? m.gsmWh * 450.7 : -1, seCo2: m.gsmWh ? m.gsmWh * 30.5 : -1 }))
+    .sort((a, b) => {
+      const va = a[state.sortKey] ?? -1, vb = b[state.sortKey] ?? -1;
+      return typeof va === "string" ? va.localeCompare(vb) * state.sortDir : (va - vb) * state.sortDir;
+    });
+  const tbody = document.querySelector("#modelTable tbody");
+  tbody.innerHTML = rows.map(m => {
+    const bCls = m.cat === "Local" ? "b-local" : m.cat === "Cloud" ? "b-cloud" : m.cat === "Overhead" ? "b-over" : "b-cpu";
+    return `<tr class="${m.id === state.selectedModelId ? "selected-row" : ""}" data-mid="${m.id}">
+      <td><strong>${m.name}</strong></td>
+      <td><span class="badge ${bCls}">${m.runtime}</span></td>
+      <td class="mono">${m.agAcc !== null ? m.agAcc.toFixed(1) + "%" : "—"}</td>
+      <td class="mono">${m.agWh !== null ? m.agWh.toFixed(4) : "—"}</td>
+      <td class="mono"><strong>${m.gsmAcc.toFixed(1)}%</strong></td>
+      <td class="mono">${m.gsmWh.toFixed(4)}</td>
+      <td class="mono">${m.gsmTok.toFixed(1)}${m.thinkGsm > 0 ? " <span style='color:var(--orange)'>+" + m.thinkGsm + "</span>" : ""}</td>
+      <td class="mono">${(m.gsmWh * 450.7).toFixed(1)} g</td>
+      <td class="mono">${(m.gsmWh * 30.5).toFixed(2)} g</td>
+    </tr>`;
+  }).join("");
+  tbody.querySelectorAll("tr").forEach(tr => tr.addEventListener("click", () => {
+    state.selectedModelId = tr.dataset.mid;
+    drawPareto();
+    drawModelCard();
+    renderModelTable();
+  }));
+}
+
+document.querySelectorAll("#modelFilter .seg-opt").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#modelFilter .seg-opt").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  state.modelFilter = b.dataset.filter;
+  renderModelTable();
+}));
+document.querySelectorAll("#modelTable th[data-sort]").forEach(th => th.addEventListener("click", () => {
+  const k = th.dataset.sort;
+  state.sortDir = (state.sortKey === k) ? -state.sortDir : -1;
+  state.sortKey = k;
+  renderModelTable();
+}));
 
 document.querySelectorAll("#bottomTabs .seg-opt").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll("#bottomTabs .seg-opt").forEach(x => x.classList.remove("active"));
@@ -1033,6 +1115,7 @@ document.querySelectorAll("#bottomTabs .seg-opt").forEach(b => b.addEventListene
 
 renderAll();
 renderTab();
+renderModelTable();
 </script>
 </body>
 </html>
