@@ -378,7 +378,7 @@
   .li-link svg { width: 18px; height: 18px; display: block; }
   .team-role { margin-top: 5px; font-size: 13px; color: var(--gray); line-height: 1.45; }
 
-  /* DARK COLAB & QR CTA BANNER AT BOTTOM */
+  /* DARK COLAB CTA BANNER AT BOTTOM */
   .colab-banner {
     margin-top: 28px; background: #1C1C1E; color: #FFFFFF; border-radius: 26px;
     padding: 40px 44px; box-shadow: 0 12px 34px rgba(0,0,0,0.12);
@@ -405,13 +405,21 @@
   .colab-copy-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.45); }
   .colab-copy-btn.copied { border-color: var(--mint); color: var(--mint); }
   .colab-url-text { margin-top: 16px; font-size: 12.2px; color: #8E8E93; font-family: var(--font-mono); word-break: break-all; }
-  .colab-qr-card {
-    background: #FFFFFF; border-radius: 20px; padding: 16px 16px 12px;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.24); flex-shrink: 0;
+  .colab-links-col {
+    display: flex; flex-direction: column; gap: 12px; flex: 1 1 320px; max-width: 440px;
   }
-  .colab-qr { width: 148px; height: 148px; display: block; }
-  .colab-qr-lbl { font-size: 12px; font-weight: 600; color: #6E6E73; }
+  .colab-nb-card {
+    display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border-radius: 18px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: #FFFFFF; text-decoration: none; transition: all 0.15s ease;
+  }
+  .colab-nb-card:hover {
+    background: rgba(255,255,255,0.11); border-color: var(--mint);
+    transform: translateY(-2px); text-decoration: none;
+  }
+  .colab-nb-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mint); }
+  .colab-nb-title { font-size: 15.5px; font-weight: 700; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .colab-nb-meta { font-size: 12.5px; color: #AEAEB2; line-height: 1.4; }
 
   footer {
     margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border);
@@ -777,9 +785,9 @@
     </div>
 
     <div id="data-downloads" class="dl-grid" style="scroll-margin-top:76px;">
-      <a class="dl-card" href="./local_benchmark.ipynb" download><div class="dl-kind">Notebook · Local CPU</div><div class="dl-title">local_benchmark.ipynb</div><div class="dl-meta">CodeCarbon + EcoLogits (GSM8K &amp; AG News)</div></a>
-      <a class="dl-card" href="./api_benchmark.ipynb" download><div class="dl-kind">Notebook · Mistral API</div><div class="dl-title">api_benchmark.ipynb</div><div class="dl-meta">Mistral 3B, Large &amp; 4.0 Thinking + EcoLogits</div></a>
-      <a class="dl-card" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener"><div class="dl-kind">Google Colab · L4 GPU</div><div class="dl-title">Open Complete Notebook</div><div class="dl-meta">12-cell L4 + Ollama + DeepSeek logs</div></a>
+      <a class="dl-card" href="https://colab.research.google.com/drive/1ZXAz-w7ZdF6_KkbLagx1WQnEus4Pa_yo" target="_blank" rel="noopener"><div class="dl-kind">Google Colab · Local CPU</div><div class="dl-title">local_benchmark.ipynb &#8599;</div><div class="dl-meta">CodeCarbon + EcoLogits (GSM8K &amp; AG News)</div></a>
+      <a class="dl-card" href="https://colab.research.google.com/drive/1s2wkW8gZxkla_8i-8oRhyhHTmdsCTGGP" target="_blank" rel="noopener"><div class="dl-kind">Google Colab · Mistral API</div><div class="dl-title">api_benchmark.ipynb &#8599;</div><div class="dl-meta">Mistral 3B, Large &amp; 4.0 Thinking + EcoLogits</div></a>
+      <a class="dl-card" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener"><div class="dl-kind">Google Colab · L4 GPU</div><div class="dl-title">Open Complete Notebook &#8599;</div><div class="dl-meta">12-cell L4 + Ollama + DeepSeek logs</div></a>
       <a class="dl-card" href="./datacenters.csv" download><div class="dl-kind">CSV · 91 EU Datacenters</div><div class="dl-title">datacenters.csv</div><div class="dl-meta">Operator, city, coordinates, PUE &amp; WUE</div></a>
       <a class="dl-card" href="./exp_h_europe_2025_country_datacenter_summary.csv" download><div class="dl-kind">CSV · 2025 EU Grid CI</div><div class="dl-title">2025 Country Grid Summary</div><div class="dl-meta">17-country carbon intensity &amp; effective IT CI</div></a>
       <a class="dl-card" href="./exp_i_multirun_raw.csv" download><div class="dl-kind">CSV · L4 K=5 Suite</div><div class="dl-title">exp_i_multirun_raw.csv</div><div class="dl-meta">35-run repeatability &amp; cold-start telemetry</div></a>
@@ -894,20 +902,28 @@
     </div>
   </section>
 
-  <!-- DARK COLAB NOTEBOOK & QR CODE CTA BANNER -->
-  <section id="colab-cta" class="colab-banner" aria-label="Open interactive Google Colab notebook">
+  <!-- DARK COLAB NOTEBOOKS CTA BANNER -->
+  <section id="colab-cta" class="colab-banner" aria-label="Open interactive Google Colab notebooks">
     <div class="colab-left">
       <h2>Run the<br/>experiments yourself</h2>
-      <p class="colab-sub">The Colab notebook reproduces every benchmark, the grid analysis and the five-run repeatability suite.</p>
+      <p class="colab-sub">Open all three Google Colab notebooks to reproduce every benchmark, the grid analysis, the Mistral API runs, and the five-run repeatability suite.</p>
       <div class="colab-actions">
-        <a class="colab-open-btn" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener">Open in Google Colab &#8599;</a>
+        <a class="colab-open-btn" href="https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3" target="_blank" rel="noopener">Open Complete L4 Notebook &#8599;</a>
         <button type="button" class="colab-copy-btn" id="copyColabBtn">Copy link</button>
       </div>
       <div class="colab-url-text">https://colab.research.google.com/drive/1XeQ1UkLYqPjNXCx-7itUNZuxgIaP53C3</div>
     </div>
-    <div class="colab-qr-card">
-      <svg class="colab-qr" viewBox="-2 -2 43 43" shape-rendering="crispEdges" role="img" aria-label="QR code to open Google Colab notebook"><rect x="-2" y="-2" width="43" height="43" fill="#FFFFFF"/><path d="M1 1h7v1h-7zM10 1h1v1h-1zM14 1h1v1h-1zM16 1h4v1h-4zM21 1h1v1h-1zM24 1h1v1h-1zM29 1h1v1h-1zM31 1h7v1h-7zM1 2h1v1h-1zM7 2h1v1h-1zM11 2h1v1h-1zM14 2h5v1h-5zM20 2h1v1h-1zM23 2h1v1h-1zM27 2h3v1h-3zM31 2h1v1h-1zM37 2h1v1h-1zM1 3h1v1h-1zM3 3h3v1h-3zM7 3h1v1h-1zM9 3h1v1h-1zM11 3h2v1h-2zM14 3h4v1h-4zM20 3h4v1h-4zM25 3h1v1h-1zM27 3h1v1h-1zM29 3h1v1h-1zM31 3h1v1h-1zM33 3h3v1h-3zM37 3h1v1h-1zM1 4h1v1h-1zM3 4h3v1h-3zM7 4h1v1h-1zM9 4h3v1h-3zM14 4h2v1h-2zM18 4h1v1h-1zM20 4h1v1h-1zM23 4h6v1h-6zM31 4h1v1h-1zM33 4h3v1h-3zM37 4h1v1h-1zM1 5h1v1h-1zM3 5h3v1h-3zM7 5h1v1h-1zM9 5h1v1h-1zM11 5h4v1h-4zM16 5h2v1h-2zM19 5h2v1h-2zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h2v1h-2zM29 5h1v1h-1zM31 5h1v1h-1zM33 5h3v1h-3zM37 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1zM9 6h1v1h-1zM11 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM19 6h1v1h-1zM21 6h2v1h-2zM28 6h1v1h-1zM31 6h1v1h-1zM37 6h1v1h-1zM1 7h7v1h-7zM9 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM17 7h1v1h-1zM19 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM25 7h1v1h-1zM27 7h1v1h-1zM29 7h1v1h-1zM31 7h7v1h-7zM9 8h2v1h-2zM12 8h1v1h-1zM14 8h3v1h-3zM21 8h4v1h-4zM27 8h1v1h-1zM1 9h1v1h-1zM3 9h5v1h-5zM10 9h2v1h-2zM13 9h1v1h-1zM19 9h5v1h-5zM25 9h5v1h-5zM31 9h5v1h-5zM2 10h4v1h-4zM8 10h1v1h-1zM11 10h1v1h-1zM13 10h1v1h-1zM16 10h2v1h-2zM23 10h1v1h-1zM27 10h1v1h-1zM32 10h1v1h-1zM34 10h1v1h-1zM36 10h1v1h-1zM6 11h2v1h-2zM9 11h7v1h-7zM21 11h1v1h-1zM23 11h1v1h-1zM26 11h1v1h-1zM28 11h2v1h-2zM31 11h1v1h-1zM36 11h2v1h-2zM1 12h2v1h-2zM5 12h1v1h-1zM8 12h7v1h-7zM17 12h1v1h-1zM19 12h1v1h-1zM22 12h3v1h-3zM27 12h4v1h-4zM37 12h1v1h-1zM2 13h2v1h-2zM5 13h3v1h-3zM10 13h1v1h-1zM13 13h1v1h-1zM17 13h2v1h-2zM23 13h1v1h-1zM25 13h3v1h-3zM29 13h3v1h-3zM33 13h1v1h-1zM36 13h2v1h-2zM2 14h1v1h-1zM8 14h2v1h-2zM11 14h1v1h-1zM13 14h1v1h-1zM15 14h4v1h-4zM20 14h3v1h-3zM24 14h1v1h-1zM29 14h1v1h-1zM32 14h1v1h-1zM36 14h1v1h-1zM3 15h2v1h-2zM6 15h2v1h-2zM16 15h3v1h-3zM21 15h2v1h-2zM25 15h1v1h-1zM27 15h2v1h-2zM32 15h3v1h-3zM37 15h1v1h-1zM2 16h2v1h-2zM5 16h2v1h-2zM8 16h2v1h-2zM12 16h1v1h-1zM16 16h1v1h-1zM18 16h5v1h-5zM24 16h1v1h-1zM29 16h1v1h-1zM32 16h2v1h-2zM36 16h2v1h-2zM3 17h1v1h-1zM7 17h1v1h-1zM9 17h2v1h-2zM13 17h5v1h-5zM20 17h1v1h-1zM24 17h2v1h-2zM27 17h1v1h-1zM30 17h3v1h-3zM35 17h1v1h-1zM37 17h1v1h-1zM1 18h1v1h-1zM3 18h2v1h-2zM11 18h1v1h-1zM13 18h4v1h-4zM19 18h1v1h-1zM21 18h4v1h-4zM27 18h1v1h-1zM31 18h2v1h-2zM36 18h1v1h-1zM3 19h2v1h-2zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM15 19h6v1h-6zM23 19h1v1h-1zM25 19h1v1h-1zM27 19h2v1h-2zM30 19h1v1h-1zM32 19h1v1h-1zM36 19h2v1h-2zM1 20h2v1h-2zM5 20h1v1h-1zM11 20h1v1h-1zM15 20h2v1h-2zM19 20h5v1h-5zM25 20h1v1h-1zM27 20h2v1h-2zM30 20h1v1h-1zM37 20h1v1h-1zM2 21h4v1h-4zM7 21h1v1h-1zM9 21h1v1h-1zM12 21h1v1h-1zM15 21h4v1h-4zM20 21h1v1h-1zM23 21h5v1h-5zM30 21h2v1h-2zM33 21h3v1h-3zM1 22h4v1h-4zM6 22h1v1h-1zM8 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM19 22h4v1h-4zM24 22h2v1h-2zM34 22h1v1h-1zM36 22h2v1h-2zM1 23h2v1h-2zM4 23h1v1h-1zM6 23h2v1h-2zM9 23h3v1h-3zM14 23h4v1h-4zM19 23h1v1h-1zM21 23h3v1h-3zM25 23h1v1h-1zM27 23h2v1h-2zM30 23h1v1h-1zM32 23h3v1h-3zM36 23h2v1h-2zM1 24h1v1h-1zM3 24h1v1h-1zM5 24h1v1h-1zM8 24h1v1h-1zM10 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM22 24h2v1h-2zM25 24h1v1h-1zM27 24h1v1h-1zM32 24h2v1h-2zM36 24h2v1h-2zM2 25h1v1h-1zM6 25h4v1h-4zM12 25h2v1h-2zM19 25h1v1h-1zM24 25h1v1h-1zM27 25h7v1h-7zM35 25h3v1h-3zM1 26h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM16 26h3v1h-3zM23 26h2v1h-2zM29 26h4v1h-4zM34 26h2v1h-2zM1 27h1v1h-1zM3 27h1v1h-1zM5 27h1v1h-1zM7 27h1v1h-1zM9 27h2v1h-2zM12 27h2v1h-2zM15 27h1v1h-1zM19 27h1v1h-1zM21 27h3v1h-3zM28 27h3v1h-3zM32 27h1v1h-1zM35 27h3v1h-3zM1 28h1v1h-1zM8 28h3v1h-3zM13 28h3v1h-3zM17 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM27 28h1v1h-1zM31 28h1v1h-1zM33 28h1v1h-1zM36 28h2v1h-2zM1 29h1v1h-1zM3 29h2v1h-2zM7 29h3v1h-3zM12 29h2v1h-2zM15 29h1v1h-1zM18 29h1v1h-1zM23 29h1v1h-1zM25 29h10v1h-10zM9 30h2v1h-2zM12 30h2v1h-2zM15 30h1v1h-1zM18 30h1v1h-1zM20 30h3v1h-3zM24 30h1v1h-1zM26 30h4v1h-4zM33 30h2v1h-2zM1 31h7v1h-7zM10 31h5v1h-5zM16 31h3v1h-3zM26 31h2v1h-2zM29 31h1v1h-1zM31 31h1v1h-1zM33 31h1v1h-1zM35 31h3v1h-3zM1 32h1v1h-1zM7 32h1v1h-1zM9 32h1v1h-1zM11 32h1v1h-1zM14 32h12v1h-12zM29 32h1v1h-1zM33 32h2v1h-2zM37 32h1v1h-1zM1 33h1v1h-1zM3 33h3v1h-3zM7 33h1v1h-1zM9 33h1v1h-1zM11 33h1v1h-1zM16 33h2v1h-2zM20 33h4v1h-4zM27 33h7v1h-7zM35 33h1v1h-1zM1 34h1v1h-1zM3 34h3v1h-3zM7 34h1v1h-1zM9 34h1v1h-1zM15 34h2v1h-2zM19 34h2v1h-2zM22 34h1v1h-1zM24 34h1v1h-1zM27 34h1v1h-1zM30 34h2v1h-2zM33 34h1v1h-1zM35 34h1v1h-1zM37 34h1v1h-1zM1 35h1v1h-1zM3 35h3v1h-3zM7 35h1v1h-1zM9 35h1v1h-1zM11 35h3v1h-3zM15 35h4v1h-4zM21 35h3v1h-3zM25 35h2v1h-2zM28 35h1v1h-1zM34 35h1v1h-1zM36 35h2v1h-2zM1 36h1v1h-1zM7 36h1v1h-1zM10 36h1v1h-1zM13 36h1v1h-1zM16 36h1v1h-1zM19 36h2v1h-2zM22 36h4v1h-4zM28 36h1v1h-1zM33 36h1v1h-1zM37 36h1v1h-1zM1 37h7v1h-7zM9 37h1v1h-1zM12 37h5v1h-5zM18 37h1v1h-1zM24 37h4v1h-4zM31 37h1v1h-1zM33 37h1v1h-1zM36 37h2v1h-2z" fill="#1D1D1F"/></svg>
-      <div class="colab-qr-lbl">Scan to open</div>
+    <div class="colab-links-col">
+      <a class="colab-nb-card" href="https://colab.research.google.com/drive/1ZXAz-w7ZdF6_KkbLagx1WQnEus4Pa_yo" target="_blank" rel="noopener">
+        <div class="colab-nb-tag">Google Colab · Local CPU</div>
+        <div class="colab-nb-title"><span>local_benchmark.ipynb</span><span>&#8599;</span></div>
+        <div class="colab-nb-meta">CodeCarbon + EcoLogits · Intel i7-8850H GSM8K &amp; AG News</div>
+      </a>
+      <a class="colab-nb-card" href="https://colab.research.google.com/drive/1s2wkW8gZxkla_8i-8oRhyhHTmdsCTGGP" target="_blank" rel="noopener">
+        <div class="colab-nb-tag">Google Colab · Mistral API</div>
+        <div class="colab-nb-title"><span>api_benchmark.ipynb</span><span>&#8599;</span></div>
+        <div class="colab-nb-meta">Mistral 3B, Large &amp; 4.0 Thinking + EcoLogits</div>
+      </a>
     </div>
   </section>
 
