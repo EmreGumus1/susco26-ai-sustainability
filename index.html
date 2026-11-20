@@ -450,6 +450,17 @@
   .stats-kpi .k-val { font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--ink); margin-top: 2px; }
   .stats-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
   .stats-row-top { display: flex; justify-content: space-between; font-size: 12.8px; font-weight: 600; color: var(--ink); }
+  .stats-subhead { font-size: 10.8px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray); margin: 16px 0 8px; display: flex; justify-content: space-between; align-items: center; }
+  .stats-day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .stats-day-tile { background: var(--bg); border: 1px solid var(--border-soft); border-radius: 10px; padding: 7px 4px; text-align: center; }
+  .stats-day-tile.today { border-color: var(--blue); background: var(--blue-tint); }
+  .stats-day-tile .d-lbl { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; }
+  .stats-day-tile .d-val { font-size: 13.5px; font-weight: 800; font-family: var(--font-mono); color: var(--ink); margin-top: 2px; }
+  .stats-hour-chart { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; align-items: end; height: 68px; padding: 8px 8px 4px; background: var(--bg); border: 1px solid var(--border-soft); border-radius: 12px; }
+  .stats-hour-bar { border-radius: 3px 3px 1px 1px; background: #C7C7CC; min-height: 3px; transition: height 0.2s ease, background 0.15s ease; }
+  .stats-hour-bar.has-val { background: var(--blue); }
+  .stats-hour-bar.peak { background: var(--green); }
+  .stats-hour-axis { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--gray); margin-top: 4px; padding: 0 4px; }
 
   @media (max-width: 1120px) {
     .slide-bento, .two-col, .dl-grid, .bp-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -937,20 +948,27 @@
   <div class="stats-modal">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
       <div>
-        <div class="kicker">Cookieless Live Telemetry · ?stats=1</div>
+        <div class="kicker">Zero-Storage Aggregate Telemetry · ?stats=1</div>
         <h3 style="margin:3px 0 4px;font-size:21px;font-weight:800;letter-spacing:-0.02em;">SusCo26 Visitor &amp; Click Stats</h3>
-        <div style="font-size:12.2px;color:var(--gray);">Anonymous aggregate counts only (zero cookies, zero PII). Opening <code>?stats=1</code> does not increment visits.</div>
+        <div style="font-size:12.2px;color:var(--gray);">Anonymous aggregate counters only (zero cookies, zero browser storage, zero PII). Opening <code>?stats=1</code> does not increment visits.</div>
       </div>
       <button type="button" class="pill-btn" id="closeStatsBtn" style="border:1px solid var(--border);padding:6px 12px;">Close</button>
     </div>
 
     <div class="stats-kpi-grid">
       <div class="stats-kpi"><div class="k-lbl">Page Visits</div><div class="k-val" id="stVisits">—</div></div>
-      <div class="stats-kpi"><div class="k-lbl">Sessions</div><div class="k-val" id="stSessions">—</div></div>
+      <div class="stats-kpi"><div class="k-lbl">Peak Hour (CET)</div><div class="k-val" id="stPeakHour">—</div></div>
       <div class="stats-kpi"><div class="k-lbl">Interactions</div><div class="k-val" id="stInteractions" style="color:var(--blue);">—</div></div>
     </div>
 
     <div id="statsBreakdown"></div>
+
+    <div class="stats-subhead"><span>Visits by Day (Berlin Time)</span><span id="stNowBerlin" class="mono" style="font-weight:700;color:var(--ink);">—</span></div>
+    <div class="stats-day-grid" id="statsDays"></div>
+
+    <div class="stats-subhead"><span>Visits by Hour (00–23 Berlin Time)</span><span id="stPeakLabel" style="font-weight:700;color:var(--green);">—</span></div>
+    <div class="stats-hour-chart" id="statsHours"></div>
+    <div class="stats-hour-axis"><span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>23h</span></div>
 
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);font-size:12px;color:var(--gray);">
       <span id="stEngagement">Avg interactions / visit: —</span>
@@ -1986,19 +2004,45 @@ function trackInteraction(key, debounceMs = 0) {
   }
 }
 
+const STAT_DAYS = [
+  { key: "mon", label: "Mon" }, { key: "tue", label: "Tue" }, { key: "wed", label: "Wed" },
+  { key: "thu", label: "Thu" }, { key: "fri", label: "Fri" }, { key: "sat", label: "Sat" },
+  { key: "sun", label: "Sun" }
+];
+const STAT_HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+
+function getBerlinDayHour() {
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Berlin", weekday: "short", hour: "2-digit", hourCycle: "h23"
+    }).formatToParts(new Date());
+    const wd = (parts.find(p => p.type === "weekday")?.value || "mon").slice(0, 3).toLowerCase();
+    const hr = String(Number(parts.find(p => p.type === "hour")?.value || "0") % 24).padStart(2, "0");
+    return { day: STAT_DAYS.some(d => d.key === wd) ? wd : "mon", hour: hr };
+  } catch {
+    const now = new Date();
+    const wd = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][now.getUTCDay()];
+    const hr = String((now.getUTCHours() + 1) % 24).padStart(2, "0");
+    return { day: wd, hour: hr };
+  }
+}
+
 async function loadStatsDashboard() {
-  const keys = ["visits", "sessions", "interactions", ...STAT_META.map(m => m.key)];
+  const dayKeys = STAT_DAYS.map(d => "d-" + d.key);
+  const hourKeys = STAT_HOURS.map(h => "h-" + h);
+  const keys = ["visits", "interactions", ...STAT_META.map(m => m.key), ...dayKeys, ...hourKeys];
   const vals = await Promise.all(keys.map(statGet));
   const map = {};
   keys.forEach((k, i) => { map[k] = vals[i]; });
   cachedVisits = map["visits"];
   cachedInteractions = map["interactions"];
   updateFooterBadge();
+
   document.getElementById("stVisits").textContent = map["visits"].toLocaleString();
-  document.getElementById("stSessions").textContent = map["sessions"].toLocaleString();
   document.getElementById("stInteractions").textContent = map["interactions"].toLocaleString();
   const avg = map["visits"] > 0 ? (map["interactions"] / map["visits"]).toFixed(1) : "0.0";
   document.getElementById("stEngagement").textContent = `Avg interactions / visit: ${avg}`;
+
   const maxVal = Math.max(...STAT_META.map(m => map[m.key]), 1);
   document.getElementById("statsBreakdown").innerHTML = STAT_META.map(m => {
     const v = map[m.key];
@@ -2008,6 +2052,38 @@ async function loadStatsDashboard() {
       <div class="bar-track" style="height:8px;"><div class="bar-fill" style="width:${w}%;background:${m.col};"></div></div>
     </div>`;
   }).join("");
+
+  const nowB = getBerlinDayHour();
+  const nowEl = document.getElementById("stNowBerlin");
+  if (nowEl) nowEl.textContent = `Now: ${nowB.day.toUpperCase()} ${nowB.hour}:00`;
+
+  const daysEl = document.getElementById("statsDays");
+  if (daysEl) {
+    daysEl.innerHTML = STAT_DAYS.map(d => {
+      const v = map["d-" + d.key] || 0;
+      return `<div class="stats-day-tile${d.key === nowB.day ? " today" : ""}">
+        <div class="d-lbl">${d.label}</div>
+        <div class="d-val">${v.toLocaleString()}</div>
+      </div>`;
+    }).join("");
+  }
+
+  const hVals = STAT_HOURS.map(h => map["h-" + h] || 0);
+  const maxH = Math.max(...hVals, 0);
+  const peakIdx = maxH > 0 ? hVals.indexOf(maxH) : -1;
+  document.getElementById("stPeakHour").textContent = peakIdx >= 0 ? `${STAT_HOURS[peakIdx]}:00` : "—";
+  const peakLbl = document.getElementById("stPeakLabel");
+  if (peakLbl) peakLbl.textContent = peakIdx >= 0 ? `Peak: ${STAT_HOURS[peakIdx]}:00 (${maxH})` : "Collecting since update";
+
+  const hoursEl = document.getElementById("statsHours");
+  if (hoursEl) {
+    hoursEl.innerHTML = STAT_HOURS.map((h, i) => {
+      const v = hVals[i];
+      const pct = maxH > 0 ? Math.max(v > 0 ? 12 : 5, Math.round((v / maxH) * 100)) : 6;
+      const cls = v > 0 ? (i === peakIdx ? "stats-hour-bar peak" : "stats-hour-bar has-val") : "stats-hour-bar";
+      return `<div class="${cls}" style="height:${pct}%;" title="${h}:00–${h}:59 Berlin: ${v.toLocaleString()} visit${v === 1 ? "" : "s"}"></div>`;
+    }).join("");
+  }
 }
 
 function openStatsModal() {
@@ -2048,17 +2124,14 @@ document.addEventListener("input", e => {
   else if (id === "s1Slider" || id === "s2Slider" || id === "s3Slider") trackInteraction("batching-click", 800);
 });
 
-// Record visit/session on normal load, or open dashboard cleanly on ?stats=1
+// Record purely anonymous aggregate visit + Berlin day/hour bucket (zero cookies, zero browser storage)
 if (isStatsView) {
   openStatsModal();
 } else {
+  const bh = getBerlinDayHour();
   statHit("visits");
-  try {
-    if (!sessionStorage.getItem("susco26_sess_counted")) {
-      sessionStorage.setItem("susco26_sess_counted", "1");
-      statHit("sessions");
-    }
-  } catch {}
+  statHit("d-" + bh.day);
+  statHit("h-" + bh.hour);
 }
 
 const bootToken = getActiveMapKitToken();
