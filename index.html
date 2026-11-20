@@ -217,7 +217,19 @@
     backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.16);
     color: #FFFFFF; border-radius: 16px; padding: 12px 14px;
+    transition: transform 0.18s ease, box-shadow 0.22s ease;
   }
+  @keyframes vcPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.42); }
+    45% { transform: scale(1.014); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0.14); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+  }
+  .verdict-card.vc-pulse { animation: vcPulse 0.26s ease-out; }
+  #mapkitContainer { cursor: pointer; }
+  .mk-country-pill { transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease; }
+  .mk-country-pill:hover { transform: scale(1.10); }
+  .mk-dc-dot { transition: transform 0.14s ease, background-color 0.14s ease, box-shadow 0.14s ease; }
+  .mk-dc-dot:hover { transform: scale(1.28); }
   .verdict-tag { display: inline-block; background: var(--mint); color: var(--ink); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
   .verdict-card.cloud-mode .verdict-tag { background: #5AC8FA; }
   .verdict-title { margin: 5px 0 7px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.18; }
@@ -983,11 +995,97 @@ const DEFAULT_MAPKIT_TOKEN = "eyJhbGciOiJFUzI1NiIsImtpZCI6Iko1TDZLNjZMMjkiLCJ0eX
 let mkMap = null;
 let mkCountryPolys = {};
 let mkCountryLabels = [];
+let mkCountryLabelNodes = [];
 let mkDcAnnotations = [];
-let lastMkDcKey = "";
+let mkDcNodes = [];
+let lastMkCat = "";
 let mkRouteOverlay = null;
 let mkRouteBadge = null;
 let mkTargetBeacon = null;
+
+// Precompute bounding boxes for fast exact point-in-polygon country hit-testing
+const STUDY_POLYS = DATA.mapPaths
+  .filter(mp => !mp.bg && mp.rings && mp.rings.length)
+  .map(mp => {
+    const iso = mp.iso === "GB" ? "UK" : mp.iso;
+    const rings = mp.rings.map(r => {
+      let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+      for (let i = 0; i < r.length; i++) {
+        const x = r[i][0], y = r[i][1];
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+      return { pts: r, minX, maxX, minY, maxY };
+    });
+    return { iso, rings };
+  });
+
+function pointInRing(lon, lat, ring) {
+  if (lon < ring.minX || lon > ring.maxX || lat < ring.minY || lat > ring.maxY) return false;
+  const pts = ring.pts;
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const xi = pts[i][0], yi = pts[i][1];
+    const xj = pts[j][0], yj = pts[j][1];
+    const intersect = ((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function findCountryAtCoord(lon, lat) {
+  for (let i = 0; i < STUDY_POLYS.length; i++) {
+    const sp = STUDY_POLYS[i];
+    const c = DATA.countries[sp.iso];
+    if (!c || c.ciMean === null) continue;
+    for (let j = 0; j < sp.rings.length; j++) {
+      if (pointInRing(lon, lat, sp.rings[j])) return sp.iso;
+    }
+  }
+  // Small coastal/island fallback
+  let bestIso = null, bestDist = 1e9;
+  Object.values(DATA.countries).forEach(c => {
+    if (c.ciMean === null) return;
+    const d = (c.lat - lat) ** 2 + (c.lon - lon) ** 2;
+    if (d < bestDist) { bestDist = d; bestIso = c.country; }
+  });
+  return bestDist < 6 ? bestIso : null;
+}
+
+function getBestDcForCountry(iso) {
+  let list = DATA.dcs.filter(d => d.country === iso && (state.cat === "all" || d.category === state.cat));
+  if (!list.length) list = DATA.dcs.filter(d => d.country === iso);
+  if (!list.length) return null;
+  return list.reduce((best, cur) => ((cur.pue || 99) < (best.pue || 99) ? cur : best), list[0]);
+}
+
+function pulseVerdictCard() {
+  const vc = document.getElementById("verdictCard");
+  if (!vc) return;
+  vc.classList.remove("vc-pulse");
+  void vc.offsetWidth;
+  vc.classList.add("vc-pulse");
+}
+
+function selectCountryBest(iso) {
+  const c = DATA.countries[iso];
+  if (!c || c.ciMean === null) return false;
+  const bestDc = getBestDcForCountry(iso);
+  state.cc = iso;
+  state.dcId = bestDc ? bestDc.id : null;
+  renderAll();
+  pulseVerdictCard();
+  return true;
+}
+
+function selectSpecificDc(dc) {
+  if (!dc || dc.country === "UK") return false;
+  state.cc = dc.country;
+  state.dcId = dc.id;
+  renderAll();
+  pulseVerdictCard();
+  return true;
+}
 
 function getActiveMapKitToken() {
   return new URLSearchParams(location.search).get("mapkit_token")
@@ -1067,28 +1165,34 @@ function activateAppleMaps(token) {
         });
       });
 
-      // Country click detection on Apple Maps
-      mkMap.addEventListener("single-tap", ev => {
-        const coord = mkMap.convertPointOnPageToCoordinate(ev.pointOnPage);
-        let bestIso = null, bestDist = 1e9;
-        Object.values(DATA.countries).forEach(c => {
-          if (c.ciMean === null) return;
-          const d = (c.lat - coord.latitude) ** 2 + (c.lon - coord.longitude) ** 2;
-          if (d < bestDist) { bestDist = d; bestIso = c.country; }
-        });
-        if (bestIso && bestDist < 22) {
-          state.cc = bestIso; state.dcId = null; renderAll();
-        }
-      });
+      // Instant 0ms country click detection (exact point-in-polygon, no 300ms single-tap lag, ignores panning)
+      let mkDown = null;
+      box.addEventListener("pointerdown", ev => {
+        if (ev.button !== 0 && ev.pointerType === "mouse") return;
+        mkDown = { x: ev.clientX, y: ev.clientY, t: Date.now() };
+      }, true);
+      box.addEventListener("pointerup", ev => {
+        if (!mkDown) return;
+        const dx = ev.clientX - mkDown.x, dy = ev.clientY - mkDown.y;
+        const dt = Date.now() - mkDown.t;
+        mkDown = null;
+        if (dx * dx + dy * dy > 36 || dt > 450) return;
+        if (ev.target && ev.target.closest && ev.target.closest(".mk-dc-dot, .mk-country-pill, button, a, input")) return;
+        try {
+          const coord = mkMap.convertPointOnPageToCoordinate(new DOMPoint(ev.pageX, ev.pageY));
+          const iso = findCountryAtCoord(coord.longitude, coord.latitude);
+          if (iso) selectCountryBest(iso);
+        } catch (err) { console.warn("MapKit coord pick error:", err); }
+      }, true);
 
       mkMap.addEventListener("select", ev => {
         if (ev.annotation && ev.annotation.data) {
           if (ev.annotation.data.dc) {
-            const d = ev.annotation.data.dc;
-            if (d.country !== "UK") { state.cc = d.country; state.dcId = d.id; renderAll(); }
+            selectSpecificDc(ev.annotation.data.dc);
           } else if (ev.annotation.data.countryIso) {
-            state.cc = ev.annotation.data.countryIso; state.dcId = null; renderAll();
+            selectCountryBest(ev.annotation.data.countryIso);
           }
+          try { ev.annotation.selected = false; } catch {}
         }
       });
 
@@ -1135,52 +1239,66 @@ function syncMapKitLayer(localLon, localLat, escPct) {
     polys.forEach(p => { p.style = style; });
   });
 
-  // 2a. Refresh 91 Datacenter Annotations only when category filter or selected DC changes
-  const dcKey = `${state.cat}|${state.dcId || ""}`;
-  if (dcKey !== lastMkDcKey) {
-    lastMkDcKey = dcKey;
+  // 2a. Build Datacenter Annotations once per category filter, then update selected dot in-place (0 flicker)
+  if (state.cat !== lastMkCat) {
+    lastMkCat = state.cat;
     if (mkDcAnnotations.length) mkMap.removeAnnotations(mkDcAnnotations);
     mkDcAnnotations = [];
+    mkDcNodes = [];
     DATA.dcs.filter(d => state.cat === "all" || d.category === state.cat).forEach(d => {
-      const isSel = d.id === state.dcId;
-      const col = isSel ? "#248A3D" : d.category === "hyperscaler" ? "#007AFF" : d.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
+      const dot = document.createElement("div");
+      dot.className = "mk-dc-dot";
+      dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
+      dot.addEventListener("click", ev => {
+        ev.stopPropagation();
+        selectSpecificDc(d);
+      });
       const ann = new window.mapkit.Annotation(
         new window.mapkit.Coordinate(d.jlat, d.jlon),
-        () => {
-          const dot = document.createElement("div");
-          const sz = isSel ? 15 : Math.round(7 + ((d.pue || 1.2) - 1.05) * 14);
-          dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.32);cursor:pointer;`;
-          dot.title = `${d.name} (${d.city}, ${d.country}) · PUE ${d.pue} · Eff ${d.effCi ?? "n/a"} g`;
-          return dot;
-        },
-        { data: { dc: d } }
+        () => dot,
+        { data: { dc: d }, collisionMode: window.mapkit.Annotation.CollisionMode.None }
       );
       mkDcAnnotations.push(ann);
+      mkDcNodes.push({ id: d.id, dc: d, dot });
     });
     mkMap.addAnnotations(mkDcAnnotations);
   }
+  mkDcNodes.forEach(({ id, dc, dot }) => {
+    const isSel = id === state.dcId;
+    const col = isSel ? "#248A3D" : dc.category === "hyperscaler" ? "#007AFF" : dc.category === "european cloud" ? "#1D1D1F" : "#6E6E73";
+    const sz = isSel ? 16 : Math.round(7 + ((dc.pue || 1.2) - 1.05) * 14);
+    dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:${isSel?"2.5px":"1.5px"} solid #fff;box-shadow:${isSel?"0 0 0 4px rgba(52,199,89,0.34), 0 2px 8px rgba(0,0,0,0.38)":"0 2px 6px rgba(0,0,0,0.32)"};cursor:pointer;z-index:${isSel?40:10};`;
+  });
 
-  // 2b. Frosted Liquid Glass Country g/kWh pill annotations
-  if (mkCountryLabels.length) mkMap.removeAnnotations(mkCountryLabels);
-  mkCountryLabels = [];
-  [["SE",15.8,61.5],["NO",8.2,61.5],["FI",25.5,61.8],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
+  // 2b. Build Frosted Liquid Glass Country g/kWh pill annotations ONCE and update text/active state in-place
+  if (!mkCountryLabels.length) {
+    [["SE",15.8,61.5],["NO",8.2,61.5],["FI",25.5,61.8],["FR",2.3,46.0],["DE",10.4,50.8],["PL",19.0,53.8],["ES",-4.0,41.6],["IE",-8.1,53.3],["IT",12.8,42.5],["NL",3.2,53.4],["CH",9.8,46.4]].forEach(([iso, lo, la]) => {
+      if (!DATA.countries[iso]) return;
+      const pill = document.createElement("div");
+      pill.className = "mk-country-pill";
+      pill.addEventListener("click", ev => {
+        ev.stopPropagation();
+        selectCountryBest(iso);
+      });
+      const lblAnn = new window.mapkit.Annotation(
+        new window.mapkit.Coordinate(la, lo),
+        () => pill,
+        { data: { countryIso: iso }, collisionMode: window.mapkit.Annotation.CollisionMode.None }
+      );
+      mkCountryLabels.push(lblAnn);
+      mkCountryLabelNodes.push({ iso, pill });
+    });
+    mkMap.addAnnotations(mkCountryLabels);
+  }
+  mkCountryLabelNodes.forEach(({ iso, pill }) => {
     const c = DATA.countries[iso];
     if (!c) return;
     const ci = (hour >= 0 && c.diurnal) ? c.diurnal[hour] : c.ciMean;
     const dark = ci < 45 || ci > 420;
-    const lblAnn = new window.mapkit.Annotation(
-      new window.mapkit.Coordinate(la, lo),
-      () => {
-        const pill = document.createElement("div");
-        pill.style.cssText = `background:${dark ? "rgba(28,28,30,0.82)" : "rgba(255,255,255,0.82)"};backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);color:${dark ? "#FFFFFF" : "#1D1D1F"};font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.16);border:1px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.9)"};cursor:pointer;`;
-        pill.textContent = `${iso} ${Math.round(ci)}g`;
-        return pill;
-      },
-      { data: { countryIso: iso }, collisionMode: window.mapkit.Annotation.CollisionMode.None }
-    );
-    mkCountryLabels.push(lblAnn);
+    const isSel = iso === state.cc;
+    pill.style.cssText = `background:${dark ? "rgba(28,28,30,0.86)" : "rgba(255,255,255,0.88)"};backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);color:${dark ? "#FFFFFF" : "#1D1D1F"};font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;white-space:nowrap;box-shadow:${isSel ? "0 0 0 2.5px #34C759, 0 6px 16px rgba(0,0,0,0.28)" : "0 4px 12px rgba(0,0,0,0.16)"};border:1px solid ${isSel ? "#34C759" : (dark ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.9)")};cursor:pointer;transform:${isSel ? "scale(1.10)" : "scale(1)"};`;
+    pill.textContent = `${iso} ${Math.round(ci)}g`;
   });
-  mkMap.addAnnotations(mkCountryLabels);
 
   // 3. Keep map clean without dashed cross-border routing overlays
   if (mkRouteOverlay) { mkMap.removeOverlay(mkRouteOverlay); mkRouteOverlay = null; }
@@ -1188,10 +1306,9 @@ function syncMapKitLayer(localLon, localLat, escPct) {
   if (mkTargetBeacon) { mkMap.removeAnnotation(mkTargetBeacon); mkTargetBeacon = null; }
 }
 
-const berlinDc = DATA.dcs.find(d => d.name.includes("BER01"));
 let state = {
   cc: "DE",
-  dcId: berlinDc ? berlinDc.id : null,
+  dcId: null,
   cat: "all",
   hour: -1,
   mixPct: 50,
@@ -1208,6 +1325,10 @@ let state = {
   useMapKit: false,
   hybrid: false,
 };
+{
+  const initDc = getBestDcForCountry("DE");
+  if (initDc) state.dcId = initDc.id;
+}
 
 function stopPlay() {
   if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
@@ -1268,9 +1389,9 @@ function renderAll() {
       };
     } else {
       winner = {
-        tag: "Send it to Sweden", title: "Swedish hydro cloud wins",
+        tag: "Send it to Sweden", title: `Sweden wins over ${cinfo.name}`,
         co2: cloudV3SeCo2, acc: cloudV3Acc, wh: cloudV3Wh, mode: "cloud", esc: 100,
-        why: `On ${hwName}, ${cinfo.name}'s grid (${effCi.toFixed(0)} g/IT-kWh) is dirtier than Sweden's hydro cloud (${seEffCi.toFixed(0)} g/IT-kWh), so offloading emits less CO₂.`
+        why: `On ${hwName}, ${cinfo.name}'s best site (${effCi.toFixed(0)} g/IT-kWh) is dirtier than Sweden's hydro cloud (${seEffCi.toFixed(0)} g/IT-kWh), so offloading emits less CO₂.`
       };
     }
   } else {
@@ -1301,14 +1422,16 @@ function renderAll() {
 
   document.getElementById("mixBadge").textContent = `${Math.round(routineShare*100)}% Routine / ${state.mixPct}% Math`;
   document.getElementById("hwBadge").textContent = hwLabels[state.hwStop];
-  document.getElementById("gridBadge").textContent = `${state.cc} · ${gridCi} g/kWh${hour >= 0 ? " @ " + String(hour).padStart(2,"0") + "h" : ""}`;
+  document.getElementById("gridBadge").textContent = `${cinfo.name} (${state.cc}) · ${gridCi} g/kWh${hour >= 0 ? " @ " + String(hour).padStart(2,"0") + "h" : ""}`;
   document.getElementById("mapHourBadge").textContent = hour < 0 ? "Mean" : `${String(hour).padStart(2,"0")}:00`;
   document.getElementById("meanTimeBtn").classList.toggle("active", hour < 0);
   document.getElementById("mapHourSlider").value = String(hour);
   document.querySelectorAll("#countryPills .seg-opt").forEach(b => b.classList.toggle("active", b.dataset.cc === state.cc));
 
+  const bestForCountry = getBestDcForCountry(state.cc);
+  const isBestDc = dcObj && bestForCountry && dcObj.id === bestForCountry.id;
   document.getElementById("mapSelectionPill").innerHTML = `
-    <span>Selected: <strong>${dcObj ? dcObj.name + " (" + dcObj.city + ", " + state.cc + ")" : cinfo.name + " Grid Avg"}</strong> · PUE <b>${pue.toFixed(2)}</b> · Eff <b>${effCi.toFixed(0)} g/IT-kWh</b></span>
+    <span>${isBestDc ? "Best in " + cinfo.name + ":" : "Selected:"} <strong>${dcObj ? dcObj.name + " (" + dcObj.city + ", " + state.cc + ")" : cinfo.name + " Grid Avg"}</strong> · PUE <b>${pue.toFixed(2)}</b> · Eff <b>${effCi.toFixed(0)} g/IT-kWh</b></span>
   `;
 
   const vc = document.getElementById("verdictCard");
@@ -1410,14 +1533,14 @@ function renderMap(localLon, localLat, escPct) {
       showTT(ev, `<strong>${c.name} (${c.dcs} DCs)</strong><br/>${ci !== null ? `Grid CI: <b>${ci} g/kWh</b> · Eff IT CI: <b>${(ci*c.meanPue).toFixed(0)} g</b>` : `Mean PUE ${c.meanPue} (No 2025 CI)`}`);
     });
     p.addEventListener("mouseleave", hideTT);
-    p.addEventListener("click", () => { if (c.ciMean !== null) { state.cc = iso; state.dcId = null; renderAll(); } });
+    p.addEventListener("click", () => { selectCountryBest(iso); });
   });
 
   svg.querySelectorAll(".dc-pin").forEach(pin => {
     const d = DATA.dcs.find(x => x.id === +pin.dataset.dcid);
     pin.addEventListener("mousemove", ev => showTT(ev, `<strong>${d.name}</strong><br/>${d.city}, ${d.country} · PUE <b>${d.pue}</b> · ${d.effCi ? d.effCi + " g/IT-kWh" : "UK (no CI)"}`));
     pin.addEventListener("mouseleave", hideTT);
-    pin.addEventListener("click", ev => { ev.stopPropagation(); if (d.country !== "UK") { state.cc = d.country; state.dcId = d.id; renderAll(); } });
+    pin.addEventListener("click", ev => { ev.stopPropagation(); selectSpecificDc(d); });
   });
 }
 
@@ -1483,7 +1606,7 @@ document.querySelectorAll("#pinFilter .dc-opt[data-cat]").forEach(b => b.addEven
   document.getElementById("dcFilterLabel").textContent = b.dataset.lbl || b.textContent;
   pinFilterWrap.classList.remove("open");
   dcFilterBtn.setAttribute("aria-expanded", "false");
-  renderAll();
+  selectCountryBest(state.cc);
 }));
 document.getElementById("meanTimeBtn").addEventListener("click", () => { stopPlay(); state.hour = -1; renderAll(); });
 document.getElementById("mapHourSlider").addEventListener("input", e => { stopPlay(); state.hour = +e.target.value; renderAll(); });
@@ -1504,7 +1627,7 @@ document.querySelectorAll("[data-sethw]").forEach(el => el.addEventListener("cli
   state.hwStop = +el.dataset.sethw; document.getElementById("hwSlider").value = state.hwStop; renderAll();
 }));
 document.querySelectorAll("#countryPills .seg-opt").forEach(b => b.addEventListener("click", () => {
-  state.cc = b.dataset.cc; state.dcId = state.cc === "DE" && berlinDc ? berlinDc.id : null; renderAll();
+  selectCountryBest(b.dataset.cc);
 }));
 
 // =========================================================================
