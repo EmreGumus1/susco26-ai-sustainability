@@ -1957,6 +1957,7 @@ const STAT_META = [
   { key: "batching-click", label: "Batching (1/4/8) & Slide Cards", col: "#FF9500" },
   { key: "pareto-table", label: "Pareto, 17-Model & K=5 Controls", col: "#5856D6" },
   { key: "colab-open", label: "Google Colab Open / Copy Link", col: "#30D158" },
+  { key: "linkedin-click", label: "LinkedIn Profile Clicks", col: "#0A66C2" },
   { key: "poster-download", label: "Notebook & CSV Downloads", col: "#1D1D1F" }
 ];
 const isStatsView = new URLSearchParams(location.search).get("stats") === "1";
@@ -2030,7 +2031,8 @@ function getBerlinDayHour() {
 async function loadStatsDashboard() {
   const dayKeys = STAT_DAYS.map(d => "d-" + d.key);
   const hourKeys = STAT_HOURS.map(h => "h-" + h);
-  const keys = ["visits", "interactions", ...STAT_META.map(m => m.key), ...dayKeys, ...hourKeys];
+  const liKeys = ["li-emre", "li-wibke", "li-thomas"];
+  const keys = ["visits", "interactions", ...STAT_META.map(m => m.key), ...liKeys, ...dayKeys, ...hourKeys];
   const vals = await Promise.all(keys.map(statGet));
   const map = {};
   keys.forEach((k, i) => { map[k] = vals[i]; });
@@ -2047,8 +2049,11 @@ async function loadStatsDashboard() {
   document.getElementById("statsBreakdown").innerHTML = STAT_META.map(m => {
     const v = map[m.key];
     const w = Math.max(v > 0 ? 4 : 0, (v / maxVal) * 100).toFixed(1);
+    const sub = m.key === "linkedin-click"
+      ? ` <span style="font-size:11.2px;font-weight:600;color:var(--gray);">(Emre ${map["li-emre"]} · Wibke ${map["li-wibke"]} · Thomas ${map["li-thomas"]})</span>`
+      : "";
     return `<div class="stats-row">
-      <div class="stats-row-top"><span>${m.label}</span><span class="mono" style="font-weight:800;">${v.toLocaleString()}</span></div>
+      <div class="stats-row-top"><span>${m.label}${sub}</span><span class="mono" style="font-weight:800;">${v.toLocaleString()}</span></div>
       <div class="bar-track" style="height:8px;"><div class="bar-fill" style="width:${w}%;background:${m.col};"></div></div>
     </div>`;
   }).join("");
@@ -2107,6 +2112,17 @@ document.addEventListener("click", e => {
   if (!t || !t.closest) return;
   if (t.closest("#statsModal") || t.closest("#openStatsBtn")) return;
   if (t.closest("#hybridToggle")) { trackInteraction("hybrid-toggle"); return; }
+  const liAnchor = t.closest('a.li-link, a[href*="linkedin.com/in/"]');
+  if (liAnchor) {
+    trackInteraction("linkedin-click");
+    if (!isStatsView) {
+      const href = (liAnchor.getAttribute("href") || "").toLowerCase();
+      if (href.includes("emre")) statHit("li-emre");
+      else if (href.includes("wibke")) statHit("li-wibke");
+      else if (href.includes("thomas")) statHit("li-thomas");
+    }
+    return;
+  }
   if (t.closest(".colab-open-btn, #copyColabBtn") || t.closest('a[href*="colab.research.google.com"]')) { trackInteraction("colab-open"); return; }
   if (t.closest('a[href$=".ipynb"], a[download]')) { trackInteraction("poster-download"); return; }
   if (t.closest("#countryPills button, #pinFilter button, #zoomInBtn, #zoomOutBtn, #zoomResetBtn, #europeSvg .eu-country, #europeSvg .dc-pin, #mapkitContainer")) {
